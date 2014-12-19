@@ -18,9 +18,8 @@ import sqelevator.application.model.IElevatorModel;
 import sqelevator.application.model.IFloorModel;
 
 import javax.swing.Icon;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
-
-
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
@@ -64,7 +63,7 @@ import javax.swing.JScrollPane;
  * @author Philipp
  *
  */
-public class ElevatorUI extends JFrame implements Observer{
+public class ElevatorUI extends JFrame implements Observer {
 	/**
 	 * 
 	 */
@@ -73,12 +72,12 @@ public class ElevatorUI extends JFrame implements Observer{
 	private JTextField txtSpeed;
 	private JTextField txtWeight;
 	private JTextField txtCapacity;
-	private JTextField txtAcceleration;
-	private JTextField txtClock;
 	private JLabel label11;
 	private JLabel lblTargetFloor;
 	private JComboBox<Integer> comboElevatorNumber;
 	private JPanel panel_7;
+	
+	private long clock;
  
 	
 	private JLabel[] lblFloorPositions;
@@ -102,8 +101,7 @@ public class ElevatorUI extends JFrame implements Observer{
 	 
 	
 	private JPanel panel_1;
-	public JRadioButton rdbtnManual;
-	public JRadioButton rdbtnAuto;
+	private JCheckBox cbManual;
 	private JPanel panelElevatorTarget;
 	private JLabel lblSelectFloor;
 	private JComboBox<Integer> comboFloor;
@@ -124,31 +122,31 @@ public class ElevatorUI extends JFrame implements Observer{
 		
 		mRunWithSimulator = runWithSimulator;
 		
-		setTitle("Elevator Controller");
+		setTitle("AEC - Awesome Elevator Controller");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
 		
-		JPanel panel = new JPanel();
-		panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Elevator Status", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		getContentPane().add(panel);
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		JPanel status_panel = new JPanel();
+		status_panel.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Status", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		getContentPane().add(status_panel);
+		status_panel.setLayout(new BoxLayout(status_panel, BoxLayout.Y_AXIS));
 		
-		JPanel panel_4 = new JPanel();
+		JPanel panel_4 = new JPanel();//TODO
 		panel_4.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		panel_4.setAlignmentY(Component.TOP_ALIGNMENT);
 		panel_4.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Select Elevator", TitledBorder.CENTER, TitledBorder.TOP, null, null));
 		FlowLayout flowLayout = (FlowLayout) panel_4.getLayout();
-		panel.add(panel_4);
+		status_panel.add(panel_4);
 		
 		JLabel lblFloorNumber = new JLabel("Elevator Number");
 		panel_4.add(lblFloorNumber);
 		
-		comboElevatorNumber = new JComboBox<Integer>();
-		panel_4.add(comboElevatorNumber);
+//		comboElevatorNumber = new JComboBox<Integer>();
+//		panel_4.add(comboElevatorNumber);
 		
 		JPanel panel_2 = new JPanel();
 		panel_2.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		panel.add(panel_2);
+		status_panel.add(panel_2);
 		panel_2.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "General", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_2.setLayout(new GridLayout(5, 2, 5, 5));
 		
@@ -186,25 +184,13 @@ public class ElevatorUI extends JFrame implements Observer{
 		lblAcceleration.setHorizontalAlignment(SwingConstants.RIGHT);
 		panel_2.add(lblAcceleration);
 		
-		txtAcceleration = new JTextField();
-		txtAcceleration.setEditable(false);
-		txtAcceleration.setName("txtAcceleration");
-		panel_2.add(txtAcceleration);
-		txtAcceleration.setColumns(10);
-		
 		JLabel lblNewLabel_2 = new JLabel("Clock");
 		lblNewLabel_2.setHorizontalAlignment(SwingConstants.RIGHT);
 		panel_2.add(lblNewLabel_2);
 		
-		txtClock = new JTextField();
-		txtClock.setEditable(false);
-		txtClock.setName("txtClock");
-		panel_2.add(txtClock);
-		txtClock.setColumns(10);
-		
 		JPanel panel_6 = new JPanel();
 		panel_6.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		panel.add(panel_6);
+		status_panel.add(panel_6);
 		panel_6.setBorder(new TitledBorder(null, "Requests", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_6.setLayout(new GridLayout(0, 2, 5, 0));
 		
@@ -225,42 +211,38 @@ public class ElevatorUI extends JFrame implements Observer{
 		panel_1 = new JPanel();
 		panel_1.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Operation Mode", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_1.setAlignmentX(1.0f);
-		panel.add(panel_1);
+		status_panel.add(panel_1);
 		panel_1.setLayout(new GridLayout(0, 3, 5, 0));
 		
-		rdbtnManual = new JRadioButton("Manual");
+		cbManual = new JCheckBox("Manual Control");
 		
-		rdbtnManual.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if(rdbtnManual.isSelected()){
+		cbManual.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if(cbManual.isSelected()){
 					panelElevatorTarget.setEnabled(true);
 					comboFloor.setEnabled(true);
 					btnSetTarget.setEnabled(true);
 				}
 			}
-		});
-		panel_1.add(rdbtnManual);
-		
-		rdbtnAuto = new JRadioButton("Auto");
-		rdbtnAuto.setSelected(true);
-		
-		rdbtnAuto.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				if(rdbtnAuto.isSelected()){
-					panelElevatorTarget.setEnabled(false);
-					comboFloor.setEnabled(false);
-					btnSetTarget.setEnabled(false);
-					switchBackToAutoMode = true;
-				}
-			}
-		});
-		panel_1.add(rdbtnAuto);
+		}); 
+//		.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				if(cbManual.isSelected()){
+//					panelElevatorTarget.setEnabled(true);
+//					comboFloor.setEnabled(true);
+//					btnSetTarget.setEnabled(true);
+//				}
+//			}
+//		});
+		panel_1.add(cbManual);
 		
 		panelElevatorTarget = new JPanel();
 		panelElevatorTarget.setBorder(new TitledBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null), "Elevator Target", TitledBorder.CENTER, TitledBorder.TOP, null, null));
 		panelElevatorTarget.setAlignmentY(0.0f);
 		panelElevatorTarget.setAlignmentX(1.0f);
-		panel.add(panelElevatorTarget);
+		status_panel.add(panelElevatorTarget);
 		
 		
 		
@@ -287,7 +269,7 @@ public class ElevatorUI extends JFrame implements Observer{
 		});
 		panelElevatorTarget.add(btnSetTarget);
 		
-		if(rdbtnAuto.isSelected()){
+		if(cbManual.isSelected()){
 			panelElevatorTarget.setEnabled(false);
 			comboFloor.setEnabled(false);
 			btnSetTarget.setEnabled(false);
@@ -319,8 +301,7 @@ public class ElevatorUI extends JFrame implements Observer{
 		}
 		
 		btnGroupOperationMode = new ButtonGroup();
-		btnGroupOperationMode.add(rdbtnAuto);
-		btnGroupOperationMode.add(rdbtnManual);
+		btnGroupOperationMode.add(cbManual);
 
 		loadImageResource();
 	}
@@ -336,16 +317,16 @@ public class ElevatorUI extends JFrame implements Observer{
 			public void run() {
 				// TODO Auto-generated method stub
 				synchronized (this) {
-					String curValue = txtClock.getText().toString();
+					long curValue = clock;
 					try {
 						Thread.sleep(1000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					String nextValue = txtClock.getText().toString();
+					long nextValue = clock;
 					
-					if(curValue.equals(nextValue)){
+					if(curValue==nextValue){
 						mSimulorRunning = false;
 					}else{
 						mSimulorRunning = true;
@@ -430,12 +411,11 @@ public class ElevatorUI extends JFrame implements Observer{
 					int i = 0;
 				
 					txtSpeed.setText( model.getSpeed() + " ft/sec");
-					txtAcceleration.setText(model.getAcceleration() + " ft/sec-2");
 					txtWeight.setText(model.getWeight() + " lbs");
 					
 		            // #### To be done convert ticks to time stan
 					
-					txtClock.setText(String.valueOf(model.getClockTick()));
+					clock = model.getClockTick();
 					lblTargetFloor.setText( String.valueOf(model.getNextTargetFloor()));
 					
 					
@@ -514,7 +494,7 @@ public class ElevatorUI extends JFrame implements Observer{
 					}
 				}
 				
-				if(rdbtnAuto.isSelected()){
+				if(cbManual.isSelected()){
 					currentFloor = model.getElevatorFloorNumber();
 					if(currentFloor == target || switchBackToAutoMode){
 						int elevatorNum=Integer.parseInt(comboElevatorNumber.getSelectedItem().toString());
@@ -669,10 +649,10 @@ public class ElevatorUI extends JFrame implements Observer{
 	
 	public void setElevatorMode(String mode){
 		if(mode.equalsIgnoreCase("Manual")){
-			rdbtnManual.setSelected(true);
+			cbManual.setSelected(true);
 		}
 		else{
-			rdbtnManual.setSelected(false);
+			cbManual.setSelected(false);
 		}
 	}
 	
@@ -684,7 +664,7 @@ public class ElevatorUI extends JFrame implements Observer{
 	}
 	
 	public String getElevatorMode(){
-		if(rdbtnManual.isSelected()){
+		if(cbManual.isSelected()){
 			return "Manual";
 		}
 		return "Automatic";
@@ -715,23 +695,4 @@ public class ElevatorUI extends JFrame implements Observer{
 			//JOptionPane.showMessageDialog(this, "Succesful !");
 		}
 	}
-	
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-	       SwingUtilities.invokeLater(new Runnable() {
-	            public void run() { 
-	            	ElevatorUI elevatorUI = new ElevatorUI(true);
-	            	elevatorUI.setSize(600,750);
-	            	elevatorUI.setVisible(true);
-	            	 elevatorUI.setElevatorPosition(0, 2);
-	            	 elevatorUI.setFloorrButtonStatus(0, 0);
-	            	 elevatorUI.setFloorrButtonStatus(5,1);
-	            	 elevatorUI.setFloorrButtonStatus(2, 1);
-	            	 elevatorUI.setFloorrButtonStatus(3, -1);
-	        	}
-	        });
-
-	
-	}
-
 }
