@@ -5,7 +5,8 @@ import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
-
+import java.awt.Dimension;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -42,9 +43,10 @@ public class AECUI extends JFrame implements Observer {
 	private boolean uiLoaded = false;
 
 	public AECUI() {
-		// setup layout
-		getContentPane().setLayout(
-				new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+
+		super("Elevator Control");
+		//setup layout
+		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		// add weight and speed panel
@@ -60,6 +62,7 @@ public class AECUI extends JFrame implements Observer {
 
 		pWeightSpeed.add(new JLabel(iiWeight));
 		pWeightSpeed.add(lWeight);
+		pWeightSpeed.add(Box.createRigidArea(new Dimension(20,0)));
 		pWeightSpeed.add(new JLabel(iiSpeed));
 		pWeightSpeed.add(lSpeed);
 
@@ -72,7 +75,7 @@ public class AECUI extends JFrame implements Observer {
 		pDoorState.add(new JLabel("Doors"));
 		pDoorState.add(new JLabel(iiDoors));
 		pDoorDirection.add(pDoorState);
-
+		pDoorDirection.add(Box.createRigidArea(new Dimension(20,0)));
 		JPanel pCurrentDirection = new JPanel();
 		pCurrentDirection.setLayout(new BoxLayout(pCurrentDirection,
 				BoxLayout.Y_AXIS));
@@ -96,14 +99,20 @@ public class AECUI extends JFrame implements Observer {
 			floor.setLayout(new BoxLayout(floor, BoxLayout.X_AXIS));
 			deFloors[n] = new DirectionsUIElement();
 			bFloors[n] = new JButton("Floor " + n);
-			rbFloors[n] = new JRadioButton();
-
+			rbFloors[n] = new JRadioButton("");
 			floor.add(deFloors[n]);
+			floor.add(Box.createRigidArea(new Dimension(20,0)));
 			floor.add(bFloors[n]);
+			floor.add(Box.createRigidArea(new Dimension(20,0)));
 			floor.add(rbFloors[n]);
 
 			pFloor[n] = floor;
 
+			JPanel floor_bound = new JPanel();
+			floor_bound.add(floor);
+			
+			pFloor[n] = floor_bound;
+	
 			pFloors.add(pFloor[n]);
 		}
 
@@ -111,10 +120,15 @@ public class AECUI extends JFrame implements Observer {
 
 		// add manual control
 		cbManualControl = new JCheckBox("Manual Control");
-		add(cbManualControl);
-
-		// pack and show
+		JPanel pControl = new JPanel();
+		pControl.add(cbManualControl);
+		add(pControl);
+		
+		
+		//pack and show
 		pack();
+		setMinimumSize(getSize());
+		setSize(getWidth()+40, getHeight()+30);
 		setVisible(true);
 	}
 
