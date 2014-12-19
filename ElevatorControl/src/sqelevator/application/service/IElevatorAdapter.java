@@ -1,13 +1,7 @@
-/*
-	Adelakun Adetunji - S1210455001 
-	Asnake Endalkachew - S1210455002 
-	Vladimir Marinkovic - s1210455011 
-*/
 package sqelevator.application.service;
 
 import sqelevator.application.model.ElevatorModel;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Interface IElevatorAdapter.
  */

@@ -11,7 +11,7 @@ import java.util.Observer;
 
 import sqelevator.IElevator;
 import sqelevator.application.model.ElevatorModel;
-import sqelevator.application.model.FloorModel;
+import sqelevator.application.model.Floor;
 import sqelevator.application.model.IElevatorModel;
 import sqelevator.application.model.IFloorModel;
 
@@ -23,7 +23,7 @@ public class ElevatorAdapter extends Observable implements IElevatorAdapter{
 	
 	/** The elevatorModel. */
 	private ElevatorModel elevatorModel = null;
-	private FloorModel floorModel = null;
+//	private Floor floor = null;
 	
 	/** The controller. */
 	private static IElevator controller = null;
@@ -57,21 +57,14 @@ public class ElevatorAdapter extends Observable implements IElevatorAdapter{
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see sqelevator.application.service.IElevatorAdapter#refresh()
-	 */
 	public void updateModels(){
 		try {
 			if(controller.getElevatorNum()>0){
 				int elevatorNumber = 0;
 				elevatorModel.setElevatorNumber(controller.getElevatorNum());
-				elevatorModel.setAcceleration(elevatorNumber);
 				elevatorModel.setCapacity(controller.getElevatorCapacity(elevatorNumber));
-				elevatorModel.setClockTick(controller.getClockTick());
 				elevatorModel.setCommittedDirection(controller.getCommittedDirection(elevatorNumber));
 				elevatorModel.setDoorStatus(controller.getElevatorDoorStatus(elevatorNumber));
-				elevatorModel.setFeetsPosition(controller.getElevatorFloor(elevatorNumber));
-				elevatorModel.setNearestFloor(controller.getElevatorFloor(elevatorNumber));
 				elevatorModel.setNextTargetFloor(controller.getTarget(elevatorNumber));
 				elevatorModel.setSpeed(controller.getElevatorSpeed(elevatorNumber));
 				elevatorModel.setWeight(controller.getElevatorWeight(elevatorNumber));
@@ -81,54 +74,49 @@ public class ElevatorAdapter extends Observable implements IElevatorAdapter{
 				int numOfFloors = controller.getFloorNum();
 				HashMap<Integer,Integer> requests = new HashMap<Integer,Integer>();
 				ArrayList<IFloorModel> floors = new ArrayList<IFloorModel>();
+				Floor floor;
 				for(int i=0; i<numOfFloors; i++){
-					floorModel = new FloorModel();
+					floor = new Floor();
 					boolean isDown = controller.getFloorButtonDown(i);
 					boolean isUp = controller.getFloorButtonUp(i);
 					if(isUp&&isDown){
-						floorModel.setDirection(3);
+						floor.setDirection(3);
 						requests.put(i, 3);
 					}else if(isDown){
-						floorModel.setDirection(1);
+						floor.setDirection(1);
 						requests.put(i, 1);
 					}else if(isUp){
-						floorModel.setDirection(0);
+						floor.setDirection(0);
 						requests.put(i, 0);
 					}else{
 						//neither up or down
-						floorModel.setDirection(2);
+						floor.setDirection(2);
 					}
-					floorModel.setFeetsPosition(controller.getFloorHeight() * i);
-					floorModel.setFloorNumber(i);
-					floors.add(floorModel);
-					elevatorModel.setFloors(floors);
-					elevatorModel.setFollowingRequests(requests);
+					floor.setFloorNumber(i);
+					floors.add(floor);
+					
+					
 				}
+				elevatorModel.setFloors(floors);
+				elevatorModel.setFollowingRequests(requests);
 			}
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		setChanged();
 		notifyObservers((IElevatorModel)elevatorModel);
-		notifyObservers((IFloorModel)floorModel);
+	//	notifyObservers((IFloorModel)floor);
 	}
 
-	/* (non-Javadoc)
-	 * @see sqelevator.application.service.IElevatorAdapter#isConnected()
-	 */
 	@Override
 	public boolean isConnected() {
 		return connected;
 	}
 	
-	public static IElevator getElevatorRMIInstance(){
+	public static IElevator getElevatorRmiInstance(){
 		return controller;
 	}
 	
-	/* (non-Javadoc)
-	 * @see sqelevator.application.service.IElevatorAdapter#connect()
-	 */
 	public boolean connect(){
 		try {
 			controller = (IElevator)Naming.lookup(rmiURL);
