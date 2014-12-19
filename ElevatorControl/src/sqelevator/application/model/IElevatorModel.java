@@ -15,6 +15,5 @@ public interface IElevatorModel {
 	public ArrayList<IFloorModel> getFloors();
 	public int getTotalFloorsNumber();
 	public boolean elevatorCommands(ElevatorCommands cmd, Object... params);
-	public int getElevatorFloorNumber();
-	
+	public int getElevatorFloorNumber();	
 }

@@ -1,4 +1,3 @@
-
 package sqelevator.application.model;
 
 public enum FloorCommands {

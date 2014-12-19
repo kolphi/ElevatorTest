@@ -9,6 +9,7 @@ public class Floor implements IFloorModel{
 	private int floorNumber;
 	//0 up, 1 down, 2 uncommitted, 3 up&down
 	private int direction;
+	private boolean isTarget;
 	
 	@Override
 	public int getFloorNumber() {
@@ -26,6 +27,14 @@ public class Floor implements IFloorModel{
 	
 	public void setDirection(int commitedDirection) {
 		this.direction = commitedDirection;
+	}
+	
+	public void setTarget(boolean isTarget){
+		this.isTarget = isTarget;
+	}
+	
+	public boolean isTarget(){
+		return isTarget;
 	}
 	
 	@Override

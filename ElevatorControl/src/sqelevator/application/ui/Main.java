@@ -14,19 +14,15 @@ public class Main {
 	private static IElevator controller = null;
 	//private static final String RMI_URL = "rmi://localhost/sqelevator.MockupElevatorRMI";
 	private static final String RMI_URL = "rmi://localhost/ElevatorSim";
-	static ElevatorUI elevatorUI;
+	static AECUI elevatorUI;
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-	    elevatorUI = new ElevatorUI(true);
-		elevatorUI.setSize(600, 600);
-    	elevatorUI.setVisible(true);
+	    elevatorUI = new AECUI();
     	
-//		FloorsUI floorsUI = new FloorsUI();
 		ArrayList<Observer> observers = new ArrayList<Observer>();
 		observers.add(elevatorUI);
-//		observers.add(floorsUI);
 		IElevatorAdapter adapter = new ElevatorAdapter(RMI_URL, observers);
 		runElevator(adapter);
 	}

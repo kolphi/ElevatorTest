@@ -92,7 +92,12 @@ public class ElevatorAdapter extends Observable implements IElevatorAdapter{
 						//neither up or down
 						floor.setDirection(2);
 					}
+					
+					
 					floor.setFloorNumber(i);
+					
+					floor.setTarget(controller.getServicesFloors(elevatorNumber, i));
+					
 					floors.add(floor);
 					
 					
