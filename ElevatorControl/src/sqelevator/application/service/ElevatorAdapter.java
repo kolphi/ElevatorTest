@@ -1,8 +1,3 @@
-/*
-	Adelakun Adetunji - S1210455001 
-	Asnake Endalkachew - S1210455002 
-	Vladimir Marinkovic - s1210455011 
-*/
 package sqelevator.application.service;
 
 import java.net.MalformedURLException;
@@ -20,9 +15,9 @@ import sqelevator.application.model.FloorModel;
 import sqelevator.application.model.IElevatorModel;
 import sqelevator.application.model.IFloorModel;
 
-// TODO: Auto-generated Javadoc
 /**
- * The Class ElevatorAdapter.
+ * The Class ElevatorAdapter
+ * @author Koller - S1310455008
  */
 public class ElevatorAdapter extends Observable implements IElevatorAdapter{
 	

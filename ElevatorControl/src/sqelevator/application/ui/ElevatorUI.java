@@ -1,8 +1,3 @@
-/*
-	Adelakun Adetunji - S1210455001 
-	Asnake Endalkachew - S1210455002 
-	Vladimir Marinkovic - s1210455011 
-*/
 package sqelevator.application.ui;
 
 import java.util.ArrayList;
@@ -64,6 +59,11 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.JScrollPane;
 
+/**
+ * Elevator UI class containing the view
+ * @author Philipp
+ *
+ */
 public class ElevatorUI extends JFrame implements Observer{
 	/**
 	 * 

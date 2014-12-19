@@ -22,7 +22,6 @@ public class MockupElevatorRMI extends UnicastRemoteObject implements IElevator 
 	
 	protected MockupElevatorRMI() throws RemoteException {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 	
 	@Override
