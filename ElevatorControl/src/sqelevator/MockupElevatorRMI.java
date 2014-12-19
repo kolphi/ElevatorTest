@@ -1,19 +1,17 @@
-/*
-	Adelakun Adetunji - S1210455001 
-	Asnake Endalkachew - S1210455002 
-	Vladimir Marinkovic - s1210455011 
-*/
 
 package sqelevator;
-import java.rmi.*;
-import java.rmi.server.*;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
-import java.util.Random;
 /**
  * Remote Class for the "Hello, world!" example.
  */
 public class MockupElevatorRMI extends UnicastRemoteObject implements IElevator {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String message;
 	private int target=0;
 	private int commitedDirection = 0;

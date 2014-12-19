@@ -19,16 +19,13 @@ public class ElevatorModel implements IElevatorModel{
 	private int speed;
 	private int weight;
 	private int capacity;
-	private int acceleration;
-	private long clockTick;
 	private int nextTargetFloor;
 	private HashMap<Integer, Integer> followingRequests = new HashMap<Integer, Integer>();
 	private int doorStatus;
-	private int feetsPosition;
-	private int nearestFloor;
 	private int committedDirection;
 	private int elevatorFloorNumber;
-	
+	private int totalFloorsNumber;
+	private ArrayList<IFloorModel> floors = new ArrayList<IFloorModel>();
 
 	/**
 	 * @return the elevatorFloorNumber
@@ -43,10 +40,15 @@ public class ElevatorModel implements IElevatorModel{
 	public void setElevatorFloorNumber(int elevatorFloorNumber) {
 		this.elevatorFloorNumber = elevatorFloorNumber;
 	}
+	
+	@Override
+	public ArrayList<IFloorModel> getFloors() {
+		return floors;
+	}
 
-	// floors info
-	private ArrayList<IFloorModel> floors = new ArrayList<IFloorModel>();
-	private int totalFloorsNumber;
+	public void setFloors(ArrayList<IFloorModel> floors) {
+		this.floors = floors;
+	}
 
 	@Override
 	public int getElevatorNumber() {
@@ -85,24 +87,6 @@ public class ElevatorModel implements IElevatorModel{
 	}
 
 	@Override
-	public int getAcceleration() {
-		return acceleration;
-	}
-
-	public void setAcceleration(int acceleration) {
-		this.acceleration = acceleration;
-	}
-
-	@Override
-	public long getClockTick() {
-		return clockTick;
-	}
-
-	public void setClockTick(long clockTick) {
-		this.clockTick = clockTick;
-	}
-
-	@Override
 	public int getNextTargetFloor() {
 		return nextTargetFloor;
 	}
@@ -130,24 +114,6 @@ public class ElevatorModel implements IElevatorModel{
 	}
 
 	@Override
-	public int getFeetsPosition() {
-		return feetsPosition;
-	}
-
-	public void setFeetsPosition(int feetsPosition) {
-		this.feetsPosition = feetsPosition;
-	}
-
-	@Override
-	public int getNearestFloor() {
-		return nearestFloor;
-	}
-
-	public void setNearestFloor(int nearestFloor) {
-		this.nearestFloor = nearestFloor;
-	}
-
-	@Override
 	public int getCommittedDirection() {
 		return committedDirection;
 	}
@@ -156,15 +122,6 @@ public class ElevatorModel implements IElevatorModel{
 		this.committedDirection = committedDirection;
 	}
 
-	@Override
-	public ArrayList<IFloorModel> getFloors() {
-		return floors;
-	}
-
-	public void setFloors(ArrayList<IFloorModel> floors) {
-		this.floors = floors;
-	}
-	
 	@Override
 	public int getTotalFloorsNumber() {
 		return totalFloorsNumber;
@@ -176,7 +133,7 @@ public class ElevatorModel implements IElevatorModel{
 	
 	@Override
 	public boolean elevatorCommands(ElevatorCommands cmd, Object... params){
-		IElevator controller = ElevatorAdapter.getElevatorRMIInstance();
+		IElevator controller = ElevatorAdapter.getElevatorRmiInstance();
 		switch(cmd){
 			case SET_TARGET:{
 				if(params[0] != null){
@@ -194,7 +151,7 @@ public class ElevatorModel implements IElevatorModel{
 				return false;
 			}
 		
-			case SET_SERVICES_FLOOR:{
+			case SET_STOP_REQUEST:{
 				if(params[0] != null 
 						&& params[1] != null && params[2] != null){
 					int elevatorNumber = (int) params[0];
@@ -210,7 +167,7 @@ public class ElevatorModel implements IElevatorModel{
 				}
 				return false;	
 			}
-			
+	
 			default:
 				return false;
 		}

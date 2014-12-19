@@ -10,10 +10,8 @@ import java.util.TimerTask;
 import javax.annotation.Resource;
 import javax.swing.JFrame;
 
-import sqelevator.application.bl.AutomoteModeBL;
 import sqelevator.application.model.ElevatorCommands;
 import sqelevator.application.model.FloorCommands;
-import sqelevator.application.model.FloorModel;
 import sqelevator.application.model.IElevatorModel;
 import sqelevator.application.model.IFloorModel;
 
@@ -388,7 +386,7 @@ public class ElevatorUI extends JFrame implements Observer {
 							lblStatusFloors[i].setFont(new Font("Tahoma", Font.BOLD, 15));
 							panel_8.add(lblStatusFloors[i]);
 							
-							lblHeightFloors[i] = new JLabel(floors.get(i).getFeetsPosition() +  " feet");
+		//					lblHeightFloors[i] = new JLabel(floors.get(i).getFeetsPosition() +  " feet");
 							lblHeightFloors[i].setVerticalAlignment(SwingConstants.BOTTOM);
 							lblHeightFloors[i].setHorizontalAlignment(SwingConstants.RIGHT);
 							lblHeightFloors[i].setFont(new Font("Tahoma", Font.PLAIN, 13));
@@ -411,6 +409,7 @@ public class ElevatorUI extends JFrame implements Observer {
 					int i = 0;
 				
 					txtSpeed.setText( model.getSpeed() + " ft/sec");
+					txtAcceleration.setText(model.getAcceleration() + " ft/sec-2");
 					txtWeight.setText(model.getWeight() + " lbs");
 					
 		            // #### To be done convert ticks to time stan
@@ -498,7 +497,7 @@ public class ElevatorUI extends JFrame implements Observer {
 					currentFloor = model.getElevatorFloorNumber();
 					if(currentFloor == target || switchBackToAutoMode){
 						int elevatorNum=Integer.parseInt(comboElevatorNumber.getSelectedItem().toString());
-						target = AutomoteModeBL.FindNextTarget(model.getTotalFloorsNumber(), model.getElevatorFloorNumber(), floors);
+		//				target = AutomateMode.FindNextTarget(model.getTotalFloorsNumber(), model.getElevatorFloorNumber(), floors);
 						setElevatorTarget(new int[]{elevatorNum-1,target});
 						setFloorService(new Object[]{elevatorNum-1,target, true});
 						switchBackToAutoMode = false;
@@ -684,7 +683,7 @@ public class ElevatorUI extends JFrame implements Observer {
 	}
 	
 	public void setFloorService(Object[] param){
-		boolean cmdSent=model.elevatorCommands(ElevatorCommands.SET_SERVICES_FLOOR,param);
+		boolean cmdSent=model.elevatorCommands(ElevatorCommands.SET_STOP_REQUEST,param);
 		if(!cmdSent){
 			System.out.println("ERROR!");
 			//JOptionPane.showMessageDialog(this,"Error Occured while processing your request !");
