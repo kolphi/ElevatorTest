@@ -146,4 +146,8 @@ public class ElevatorAdapter extends Observable implements IElevatorAdapter{
 	public ElevatorModel getElevatorModel() {
 		return elevatorModel;
 	}
+	
+	public IElevator getIElevator(){
+		return controller;
+	}
 }
