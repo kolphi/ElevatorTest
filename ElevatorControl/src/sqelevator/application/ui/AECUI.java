@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -23,7 +26,7 @@ import sqelevator.application.model.FloorCommands;
 import sqelevator.application.model.IElevatorModel;
 import sqelevator.application.model.IFloorModel;
 
-public class AECUI extends JFrame implements Observer {
+public class AECUI extends JFrame implements Observer, ActionListener {
 
 	private static final long serialVersionUID = -8986012443059217901L;
 	private static final String ICON_WEIGHT = "res/balance-32.png";
@@ -45,8 +48,9 @@ public class AECUI extends JFrame implements Observer {
 	public AECUI() {
 
 		super("Elevator Control");
-		//setup layout
-		getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+		// setup layout
+		getContentPane().setLayout(
+				new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 
 		// add weight and speed panel
@@ -62,7 +66,7 @@ public class AECUI extends JFrame implements Observer {
 
 		pWeightSpeed.add(new JLabel(iiWeight));
 		pWeightSpeed.add(lWeight);
-		pWeightSpeed.add(Box.createRigidArea(new Dimension(20,0)));
+		pWeightSpeed.add(Box.createRigidArea(new Dimension(20, 0)));
 		pWeightSpeed.add(new JLabel(iiSpeed));
 		pWeightSpeed.add(lSpeed);
 
@@ -75,7 +79,7 @@ public class AECUI extends JFrame implements Observer {
 		pDoorState.add(new JLabel("Doors"));
 		pDoorState.add(new JLabel(iiDoors));
 		pDoorDirection.add(pDoorState);
-		pDoorDirection.add(Box.createRigidArea(new Dimension(20,0)));
+		pDoorDirection.add(Box.createRigidArea(new Dimension(20, 0)));
 		JPanel pCurrentDirection = new JPanel();
 		pCurrentDirection.setLayout(new BoxLayout(pCurrentDirection,
 				BoxLayout.Y_AXIS));
@@ -99,20 +103,22 @@ public class AECUI extends JFrame implements Observer {
 			floor.setLayout(new BoxLayout(floor, BoxLayout.X_AXIS));
 			deFloors[n] = new DirectionsUIElement();
 			bFloors[n] = new JButton("Floor " + n);
+			bFloors[n].setActionCommand("" + n);
+			bFloors[n].addActionListener(this);
 			rbFloors[n] = new JRadioButton("");
 			floor.add(deFloors[n]);
-			floor.add(Box.createRigidArea(new Dimension(20,0)));
+			floor.add(Box.createRigidArea(new Dimension(20, 0)));
 			floor.add(bFloors[n]);
-			floor.add(Box.createRigidArea(new Dimension(20,0)));
+			floor.add(Box.createRigidArea(new Dimension(20, 0)));
 			floor.add(rbFloors[n]);
 
 			pFloor[n] = floor;
 
 			JPanel floor_bound = new JPanel();
 			floor_bound.add(floor);
-			
+
 			pFloor[n] = floor_bound;
-	
+
 			pFloors.add(pFloor[n]);
 		}
 
@@ -123,17 +129,12 @@ public class AECUI extends JFrame implements Observer {
 		JPanel pControl = new JPanel();
 		pControl.add(cbManualControl);
 		add(pControl);
-		
-		
-		//pack and show
+
+		// pack and show
 		pack();
 		setMinimumSize(getSize());
-		setSize(getWidth()+40, getHeight()+30);
+		setSize(getWidth() + 40, getHeight() + 30);
 		setVisible(true);
-	}
-
-	public static void main(String[] args) {
-		new AECUI();
 	}
 
 	@Override
@@ -177,8 +178,8 @@ public class AECUI extends JFrame implements Observer {
 					iiDoors = new ImageIcon(getClass().getClassLoader()
 							.getResource(ICON_DOORS_CLOSED));
 				}
-				//up=0, down=1 and uncommitted=2
-				switch(model.getCommittedDirection()){
+				// up=0, down=1 and uncommitted=2
+				switch (model.getCommittedDirection()) {
 				case IElevator.ELEVATOR_DIRECTION_DOWN:
 					deCurrentDirection.setUpDirection(true);
 					deCurrentDirection.setDownDirection(false);
@@ -192,7 +193,7 @@ public class AECUI extends JFrame implements Observer {
 					deCurrentDirection.setDownDirection(false);
 					break;
 				}
-				
+
 				for (IFloorModel floorModel : floors) {
 
 					int floorNum = floorModel.getFloorNumber();
@@ -260,6 +261,13 @@ public class AECUI extends JFrame implements Observer {
 					+ param[2]);
 			// JOptionPane.showMessageDialog(this, "Succesful !");
 		}
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		int n = Integer.valueOf(e.getActionCommand());
+		setElevatorTarget(new int[] { 0, n });
+
 	}
 
 }
