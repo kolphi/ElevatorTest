@@ -1,5 +1,6 @@
 package sqelevator.test;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -46,6 +47,21 @@ public class ElevatorTest {
 	}
 	
 	@Test
+	public void testElevatorConnectionNull(){
+		controller = null;
+		ArrayList<Observer> observers = new ArrayList<Observer>();
+		observers.add(elevatorUI);
+		adapter = new ElevatorAdapter(controller, observers);
+		assertFalse(adapter.getElevatorModel().isConnected());
+	}
+	
+	@Test
+	public void testElevatorConnectionEstablished(){
+		adapter.updateModels();
+		assertTrue(adapter.getElevatorModel().isConnected());
+	}
+	
+	@Test
 	public void testGetCommittedDirection(){
 		try {
 			int elevatorNumber = 0;
@@ -83,7 +99,11 @@ public class ElevatorTest {
 		try {
 			int elevatorNumber = 0;
 			controller.setCommittedDirection(elevatorNumber, expectedDirection);
+			adapter.updateModels();
 			int actualDirection = controller.getCommittedDirection(elevatorNumber);
+			assertEquals(expectedDirection, actualDirection);
+			adapter.updateModels();
+			actualDirection = adapter.getElevatorModel().getCommittedDirection();
 			assertEquals(expectedDirection, actualDirection);
 		} catch (RemoteException e) {
 			e.printStackTrace();
@@ -129,6 +149,9 @@ public class ElevatorTest {
 			int elevatorNumber = 0;
 			controller.setTarget(elevatorNumber, expectedTarget);
 			int actualTarget = controller.getTarget(elevatorNumber);
+			assertEquals(expectedTarget, actualTarget);
+			adapter.updateModels();
+			actualTarget = adapter.getElevatorModel().getNextTargetFloor();
 			assertEquals(expectedTarget, actualTarget);
 		} catch (RemoteException e) {
 			e.printStackTrace();
@@ -176,7 +199,6 @@ public class ElevatorTest {
 		}
 	}
 
-//  Moved to integration test	
 	@Test
 	public void testElevatorTarget(){
 		int target=2;
@@ -199,8 +221,9 @@ public class ElevatorTest {
 			});
 			
 			assertEquals(target,controller.getTarget(eleveatorNum));
+			adapter.updateModels();
+			assertEquals(target,adapter.getElevatorModel().getNextTargetFloor());
 		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			Assert.fail("Remote connection error.");
 		}
