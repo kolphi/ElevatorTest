@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import sqelevator.IElevator;
 import sqelevator.application.service.ElevatorAdapter;
 
-public class Floor implements IFloorModel{
+public class Floor implements IFloor{
 	private int floorNumber;
 	//0 up, 1 down, 2 uncommitted, 3 up&down
 	private int direction;
@@ -62,7 +62,7 @@ public class Floor implements IFloorModel{
 					int floor = (int) params[0];
 					try {
 						result = controller.getFloorButtonDown(floor);
-					} catch (RemoteException e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 						return result;
 					}

@@ -19,7 +19,8 @@ public class ElevatorModel implements IElevatorModel{
 	private int committedDirection;
 	private int elevatorFloorNumber;
 	private int totalFloorsNumber;
-	private ArrayList<IFloorModel> floors = new ArrayList<IFloorModel>();
+	private ArrayList<IFloor> floors = new ArrayList<IFloor>();
+	private boolean connected = false;
 
 	/**
 	 * @return the elevatorFloorNumber
@@ -36,11 +37,11 @@ public class ElevatorModel implements IElevatorModel{
 	}
 	
 	@Override
-	public ArrayList<IFloorModel> getFloors() {
+	public ArrayList<IFloor> getFloors() {
 		return floors;
 	}
 
-	public void setFloors(ArrayList<IFloorModel> floors) {
+	public void setFloors(ArrayList<IFloor> floors) {
 		this.floors = floors;
 	}
 
@@ -105,6 +106,15 @@ public class ElevatorModel implements IElevatorModel{
 
 	public void setDoorStatus(int doorStatus) {
 		this.doorStatus = doorStatus;
+	}
+	
+	@Override
+	public boolean isConnected(){
+		return this.connected;
+	}
+	
+	public void setConnected(boolean isConnected){
+		this.connected = isConnected;
 	}
 
 	@Override
