@@ -1,7 +1,7 @@
 package sqelevator.test;
 
-import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -25,48 +25,49 @@ import sqelevator.application.ui.AECUI;
 public class ElevatorTest {
 	private ElevatorAdapter adapter = null;
 	private static final String MOCK_RMI_SERVER_URL = "rmi://localhost/sqelevator.MockupElevatorRMI";
-	//private static final String MOCK_RMI_SERVER_URL = "rmi://localhost/ElevatorSim";
+	// private static final String MOCK_RMI_SERVER_URL =
+	// "rmi://localhost/ElevatorSim";
 	private AECUI elevatorUI = new AECUI();
 	private IElevator controller = null;
-	
+
 	private static final boolean RUN_TESTS_WITHOUT_SERVER = true;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		ArrayList<Observer> observers = new ArrayList<Observer>();
 		observers.add(elevatorUI);
-		
-		if(RUN_TESTS_WITHOUT_SERVER){
-			controller =  new TestMockupElevatorRMI();
+
+		if (RUN_TESTS_WITHOUT_SERVER) {
+			controller = new TestMockupElevatorRMI();
 			adapter = new ElevatorAdapter(controller, observers);
-		}else{
+		} else {
 			adapter = new ElevatorAdapter(MOCK_RMI_SERVER_URL, observers);
 			adapter.connect();
 			controller = ElevatorAdapter.getElevatorRmiInstance();
 		}
 	}
-	
+
 	@Test
-	public void testElevatorConnectionNull(){
+	public void testElevatorConnectionNull() {
 		controller = null;
 		ArrayList<Observer> observers = new ArrayList<Observer>();
 		observers.add(elevatorUI);
 		adapter = new ElevatorAdapter(controller, observers);
 		assertFalse(adapter.getElevatorModel().isConnected());
 	}
-	
+
 	@Test
-	public void testElevatorConnectionEstablished(){
+	public void testElevatorConnectionEstablished() {
 		adapter.updateModels();
 		assertTrue(adapter.getElevatorModel().isConnected());
 	}
-	
+
 	@Test
-	public void testGetCommittedDirection(){
+	public void testGetCommittedDirection() {
 		try {
 			int elevatorNumber = 0;
 			int direction = controller.getCommittedDirection(elevatorNumber);
-			assertTrue(direction ==0 || direction==1 || direction==2);
+			assertTrue(direction == 0 || direction == 1 || direction == 2);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			Assert.fail("Remote connection error.");
@@ -74,16 +75,16 @@ public class ElevatorTest {
 	}
 
 	@Test
-	public void testElevatorDirection(){
+	public void testElevatorDirection() {
 		try {
 			int elevatorNumber = 0;
 			int currentFloor = controller.getElevatorFloor(elevatorNumber);
 			int direction = controller.getCommittedDirection(elevatorNumber);
 			int nextFloor = controller.getTarget(elevatorNumber);
-			if(direction == 0 || direction == 1){
-				if(nextFloor > currentFloor){
+			if (direction == 0 || direction == 1) {
+				if (nextFloor > currentFloor) {
 					assertEquals(direction, 0);
-				}else if(nextFloor < currentFloor){
+				} else if (nextFloor < currentFloor) {
 					assertEquals(direction, 1);
 				}
 			}
@@ -92,48 +93,53 @@ public class ElevatorTest {
 			Assert.fail("Remote connection error.");
 		}
 	}
-	
+
 	@Test
-	public void testSetCommittedDirection(){
+	public void testSetCommittedDirection() {
 		int expectedDirection = 0;
 		try {
 			int elevatorNumber = 0;
 			controller.setCommittedDirection(elevatorNumber, expectedDirection);
 			adapter.updateModels();
-			int actualDirection = controller.getCommittedDirection(elevatorNumber);
+			int actualDirection = controller
+					.getCommittedDirection(elevatorNumber);
 			assertEquals(expectedDirection, actualDirection);
 			adapter.updateModels();
-			actualDirection = adapter.getElevatorModel().getCommittedDirection();
+			actualDirection = adapter.getElevatorModel()
+					.getCommittedDirection();
 			assertEquals(expectedDirection, actualDirection);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			Assert.fail("Remote connection error.");
 		}
 	}
-	
+
 	@Test
-	public void testSetServicesFloors(){
+	public void testSetServicesFloors() {
 		int expectedFloor = 3;
 		boolean expectedService = false;
 		try {
 			int elevatorNumber = 0;
-			controller.setServicesFloors(elevatorNumber, expectedFloor, expectedService);
-			boolean actualService = controller.getServicesFloors(elevatorNumber, expectedFloor);
-			assertEquals(expectedService,actualService);
+			controller.setServicesFloors(elevatorNumber, expectedFloor,
+					expectedService);
+			boolean actualService = controller.getServicesFloors(
+					elevatorNumber, expectedFloor);
+			assertEquals(expectedService, actualService);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			Assert.fail("Remote connection error.");
 		}
 	}
-	
+
 	@Test
-	public void testGetElevatorDoorStatus(){
+	public void testGetElevatorDoorStatus() {
 		try {
 			int elevatorNumber = 0;
 			int status = controller.getElevatorDoorStatus(elevatorNumber);
-			if(status == 1){
+			if (status == 1) {
 				int floor = controller.getElevatorFloor(elevatorNumber);
-				boolean service = controller.getServicesFloors(elevatorNumber, floor);
+				boolean service = controller.getServicesFloors(elevatorNumber,
+						floor);
 				assertTrue(service == true);
 			}
 		} catch (RemoteException e) {
@@ -143,7 +149,7 @@ public class ElevatorTest {
 	}
 
 	@Test
-	public void testSetTarget(){
+	public void testSetTarget() {
 		int expectedTarget = 10;
 		try {
 			int elevatorNumber = 0;
@@ -158,41 +164,42 @@ public class ElevatorTest {
 			Assert.fail("Remote connection error.");
 		}
 	}
-	
+
 	@Test
-	public void testGetElevatorButton(){
+	public void testGetElevatorButton() {
 		int floor = 0;
-		try{
+		try {
 			int elevatorNumber = 0;
-			boolean btnPressed = controller.getElevatorButton(elevatorNumber, floor);	
+			boolean btnPressed = controller.getElevatorButton(elevatorNumber,
+					floor);
 			assertNotNull(btnPressed);
-		}catch (RemoteException e) {
+		} catch (RemoteException e) {
 			e.printStackTrace();
 			Assert.fail("Remote connection error.");
 		}
 	}
-	
+
 	@Test
-	public void testGetFloorButtonDown(){
+	public void testGetFloorButtonDown() {
 		int floor = 0;
-		try{
+		try {
 			int elevatorNumber = 0;
-			boolean btnPressed = controller.getFloorButtonDown(floor);	
+			boolean btnPressed = controller.getFloorButtonDown(floor);
 			assertNotNull(btnPressed);
-		}catch (RemoteException e) {
+		} catch (RemoteException e) {
 			e.printStackTrace();
 			Assert.fail("Remote connection error.");
 		}
 	}
-	
+
 	@Test
-	public void testGetFloorButtonUp(){
+	public void testGetFloorButtonUp() {
 		int floor = 0;
-		try{
+		try {
 			int elevatorNumber = 0;
 			boolean btnPressed = controller.getFloorButtonUp(floor);
 			assertNotNull(btnPressed);
-		}catch (RemoteException e) {
+		} catch (RemoteException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			Assert.fail("Remote connection error.");
@@ -200,15 +207,15 @@ public class ElevatorTest {
 	}
 
 	@Test
-	public void testElevatorTarget(){
-		int target=2;
+	public void testElevatorTarget() {
+		int target = 2;
 		try {
 			int eleveatorNum = 0;
 			controller.setTarget(eleveatorNum, target);
-			
+
 			// Refresh delay
 			final long refreshRate = controller.getClockTick();
-			new Thread(new Runnable(){
+			new Thread(new Runnable() {
 				@Override
 				public void run() {
 					try {
@@ -219,18 +226,28 @@ public class ElevatorTest {
 					}
 				}
 			});
-			
-			assertEquals(target,controller.getTarget(eleveatorNum));
+
+			assertEquals(target, controller.getTarget(eleveatorNum));
 			adapter.updateModels();
-			assertEquals(target,adapter.getElevatorModel().getNextTargetFloor());
+			assertEquals(target, adapter.getElevatorModel()
+					.getNextTargetFloor());
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			Assert.fail("Remote connection error.");
 		}
-		
-	}
-	
-	
-	
 
+	}
+
+	@Test
+	public void testGetClockTick() {
+		long actual;
+		try {
+			actual = controller.getClockTick();
+			assertTrue(actual >= 0);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			Assert.fail("Remote connection error.");
+		}
+	}
 }

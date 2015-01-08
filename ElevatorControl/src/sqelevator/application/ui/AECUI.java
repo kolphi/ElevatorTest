@@ -33,7 +33,7 @@ public class AECUI extends JFrame implements Observer, ActionListener {
 	private static final String ICON_SPEED = "res/speedometer-32.png";
 	private static final String ICON_DOORS_OPEN = "res/door-open-64.png";
 	private static final String ICON_DOORS_CLOSED = "res/door-closed-64.png";
-	private static final int FLOOR_COUNT = 3;
+	private static final int FLOOR_COUNT = 10;
 
 	private IElevatorModel model = null;
 	private JLabel lWeight, lSpeed, lConnection;
@@ -106,6 +106,7 @@ public class AECUI extends JFrame implements Observer, ActionListener {
 			bFloors[n].setActionCommand("" + n);
 			bFloors[n].addActionListener(this);
 			rbFloors[n] = new JRadioButton("");
+			rbFloors[n].setSelected(false);
 			floor.add(deFloors[n]);
 			floor.add(Box.createRigidArea(new Dimension(20, 0)));
 			floor.add(bFloors[n]);
@@ -175,7 +176,9 @@ public class AECUI extends JFrame implements Observer, ActionListener {
 				lWeight.setText(model.getWeight() + " lbs");
 
 				// clock = model.getClockTick();
-				rbFloors[model.getNextTargetFloor()].setSelected(true);
+				ArrayList<IFloor> floorz = model.getFloors();
+				for(int n=0;n<FLOOR_COUNT;n++)
+					rbFloors[n].setSelected(floorz.get(n).isTarget());
 
 				int doorStatus = model.getDoorStatus();
 				String dStatus = null;
@@ -277,7 +280,6 @@ public class AECUI extends JFrame implements Observer, ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		int n = Integer.valueOf(e.getActionCommand());
 		setElevatorTarget(new int[] { 0, n });
-
 	}
 
 }
