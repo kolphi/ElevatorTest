@@ -7,8 +7,7 @@ import java.util.HashMap;
 import sqelevator.IElevator;
 import sqelevator.application.service.ElevatorAdapter;
 
-
-public class ElevatorModel implements IElevatorModel{
+public class ElevatorModel implements IElevatorModel {
 	private int elevatorNumber;
 	private int speed;
 	private int weight;
@@ -30,12 +29,13 @@ public class ElevatorModel implements IElevatorModel{
 	}
 
 	/**
-	 * @param elevatorFloorNumber the elevatorFloorNumber to set
+	 * @param elevatorFloorNumber
+	 *            the elevatorFloorNumber to set
 	 */
 	public void setElevatorFloorNumber(int elevatorFloorNumber) {
 		this.elevatorFloorNumber = elevatorFloorNumber;
 	}
-	
+
 	@Override
 	public ArrayList<IFloor> getFloors() {
 		return floors;
@@ -53,7 +53,7 @@ public class ElevatorModel implements IElevatorModel{
 	public void setElevatorNumber(int elevatorNumber) {
 		this.elevatorNumber = elevatorNumber;
 	}
-	
+
 	@Override
 	public int getSpeed() {
 		return speed;
@@ -107,13 +107,13 @@ public class ElevatorModel implements IElevatorModel{
 	public void setDoorStatus(int doorStatus) {
 		this.doorStatus = doorStatus;
 	}
-	
+
 	@Override
-	public boolean isConnected(){
+	public boolean isConnected() {
 		return this.connected;
 	}
-	
-	public void setConnected(boolean isConnected){
+
+	public void setConnected(boolean isConnected) {
 		this.connected = isConnected;
 	}
 
@@ -134,48 +134,72 @@ public class ElevatorModel implements IElevatorModel{
 	public void setTotalFloorsNumber(int totalFloorsNumber) {
 		this.totalFloorsNumber = totalFloorsNumber;
 	}
-	
+
 	@Override
-	public boolean elevatorCommands(ElevatorCommands cmd, Object... params){
+	public boolean elevatorCommands(ElevatorCommands cmd, Object... params) {
 		IElevator controller = ElevatorAdapter.getElevatorRmiInstance();
-		switch(cmd){
-			case SET_TARGET:{
-				if(params[0] != null){
-					int p[]=(int[])params[0];
-					int elevatorNumber = (int) p[0];
-					int target = (int) p[1];
-			    try {
-					  controller.setTarget(elevatorNumber, target);
-					} catch (RemoteException e) {
-						e.printStackTrace();
-						return false;
+		switch (cmd) {
+		case SET_TARGET: {
+			if (params[0] != null) {
+				int p[] = (int[]) params[0];
+				int elevatorNumber = (int) p[0];
+				int target = (int) p[1];
+				try {
+					controller.setTarget(elevatorNumber, target);
+				} catch (RemoteException e) {
+					e.printStackTrace();
+					return false;
+				}
+				return true;
+			}
+			return false;
+		}
+
+		case SET_STOP_REQUEST: {
+			if (params[0] != null && params[1] != null && params[2] != null) {
+				int elevatorNumber = (int) params[0];
+				int floor = (int) params[1];
+				boolean service = (boolean) params[2];
+				try {
+					controller
+							.setServicesFloors(elevatorNumber, floor, service);
+				} catch (RemoteException e) {
+					e.printStackTrace();
+					return false;
+				}
+				return true;
+			}
+			return false;
+		}
+		case SET_COMMITED_DIR: {
+			if (params[0] != null) {
+				int p[] = (int[]) params[0];
+				int elevatorNumber = (int) p[0];
+				int floor = (int) p[1];
+
+				try {
+					if (elevatorFloorNumber < floor) {
+						controller.setCommittedDirection(elevatorNumber,
+								IElevator.ELEVATOR_DIRECTION_DOWN);
+					} else if (elevatorFloorNumber == floor) {
+						controller.setCommittedDirection(elevatorNumber,
+								IElevator.ELEVATOR_DIRECTION_UNCOMMITTED);
+					} else {
+						controller.setCommittedDirection(elevatorNumber,
+								IElevator.ELEVATOR_DIRECTION_UP);
 					}
 					return true;
+				} catch (RemoteException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					return false;
 				}
-				return false;
 			}
-		
-			case SET_STOP_REQUEST:{
-				if(params[0] != null 
-						&& params[1] != null && params[2] != null){
-					int elevatorNumber = (int) params[0];
-					int floor = (int) params[1];
-					boolean service = (boolean) params[2]; 
-					try {
-						controller.setServicesFloors(elevatorNumber, floor, service);
-					} catch (RemoteException e) {
-						e.printStackTrace();
-						return false;
-					}
-					return true;
-				}
-				return false;	
-			}
-	
-			default:
-				return false;
+			return false;
+		}
+		default:
+			return false;
 		}
 	}
-	
 
 }

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../.resources/report.gif" type="image/gif"/><title>Main.java</title><link rel="stylesheet" href="../../../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../.sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">AllTests (7) (08.01.2015 22:40:07)</a> &gt; <a href="../../index.html" class="el_group">ElevatorControl</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">sqelevator.application.ui</a> &gt; <span class="el_source">Main.java</span></div><h1>Main.java</h1><pre class="source lang-java linenums"><span class="nc" id="L1">package sqelevator.application.ui;</span>
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Observer;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import sqelevator.IElevator;
+import sqelevator.application.service.ElevatorAdapter;
+import sqelevator.application.service.IElevatorAdapter;
+
+<span class="nc" id="L13">public class Main {</span>
+<span class="nc" id="L14">	private static IElevator controller = null;</span>
+	// private static final String RMI_URL =
+	// &quot;rmi://localhost/sqelevator.MockupElevatorRMI&quot;;
+	private static final String RMI_URL = &quot;rmi://localhost/ElevatorSim&quot;;
+<span class="nc" id="L18">	static AECUI elevatorUI;</span>
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+<span class="nc" id="L24">		elevatorUI = new AECUI();</span>
+
+<span class="nc" id="L26">		ArrayList&lt;Observer&gt; observers = new ArrayList&lt;Observer&gt;();</span>
+<span class="nc" id="L27">		observers.add(elevatorUI);</span>
+<span class="nc" id="L28">		IElevatorAdapter adapter = new ElevatorAdapter(RMI_URL, observers);</span>
+<span class="nc" id="L29">		runElevator(adapter);</span>
+<span class="nc" id="L30">	}</span>
+
+	public static void runElevator(final IElevatorAdapter adapter) {
+<span class="nc" id="L33">			Timer timer = new Timer();</span>
+<span class="nc" id="L34">			timer.scheduleAtFixedRate(new TimerTask() {</span>
+				@Override
+				public void run() {
+<span class="nc" id="L37">						adapter.connect();</span>
+<span class="nc" id="L38">						adapter.updateModels();</span>
+<span class="nc" id="L39">						elevatorUI.repaint();</span>
+<span class="nc" id="L40">				}</span>
+<span class="nc" id="L41">			}, new Date(), 100); // every 10th of a second (100ms)</span>
+<span class="nc" id="L42">		}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.2.201409121644</span>AllTests (7) (08.01.2015 22:40:07)</div></body></html>

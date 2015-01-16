@@ -104,7 +104,6 @@ public class ElevatorTest {
 			int actualDirection = controller
 					.getCommittedDirection(elevatorNumber);
 			assertEquals(expectedDirection, actualDirection);
-			adapter.updateModels();
 			actualDirection = adapter.getElevatorModel()
 					.getCommittedDirection();
 			assertEquals(expectedDirection, actualDirection);

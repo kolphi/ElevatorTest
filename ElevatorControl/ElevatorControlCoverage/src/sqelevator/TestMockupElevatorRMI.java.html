@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../.resources/report.gif" type="image/gif"/><title>TestMockupElevatorRMI.java</title><link rel="stylesheet" href="../../../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../.sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">AllTests (7) (08.01.2015 22:40:07)</a> &gt; <a href="../../index.html" class="el_group">ElevatorControl</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">sqelevator</a> &gt; <span class="el_source">TestMockupElevatorRMI.java</span></div><h1>TestMockupElevatorRMI.java</h1><pre class="source lang-java linenums">package sqelevator;
+import java.rmi.*;
+import java.rmi.server.*;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
+/**
+ * Remote Class for the &quot;Hello, world!&quot; example.
+ */
+public class TestMockupElevatorRMI implements IElevator {
+
+	private String message;
+<span class="fc" id="L14">	private int target=0;</span>
+<span class="fc" id="L15">	private int commitedDirection = 0;</span>
+<span class="fc" id="L16">	private int floorNum = 10;</span>
+<span class="fc" id="L17">	private int  curentElevatorFloor = 0;</span>
+	
+<span class="fc" id="L19">	private HashMap&lt;Integer,Boolean&gt; floors = new HashMap&lt;Integer,Boolean&gt;(floorNum);</span>
+<span class="fc" id="L20">    private HashMap&lt;Integer, Boolean&gt; floorButtonDown = new HashMap&lt;Integer, Boolean&gt;(floorNum);</span>
+<span class="fc" id="L21">	private HashMap&lt;Integer, Boolean&gt; floorButtonUp = new HashMap&lt;Integer, Boolean&gt;(floorNum);</span>
+	
+	
+<span class="fc" id="L24">	public TestMockupElevatorRMI(){</span>
+<span class="fc bfc" id="L25" title="All 2 branches covered.">		for(int i = 0; i &lt; floorNum; i++){</span>
+<span class="fc" id="L26">			floorButtonUp.put(i, false);</span>
+<span class="fc" id="L27">			floorButtonDown.put(i, false);</span>
+		}
+		
+	//	floorButtonDown.put(5, true);
+		
+<span class="fc" id="L32">	}</span>
+	
+	@Override
+	public int getCommittedDirection(int elevatorNumber) throws RemoteException {
+<span class="fc" id="L36">		return commitedDirection;</span>
+	}
+	@Override
+	public int getElevatorAccel(int elevatorNumber) throws RemoteException {
+		
+<span class="nc" id="L41">		return 5;</span>
+	}
+	@Override
+	public boolean getElevatorButton(int elevatorNumber, int floor)
+			throws RemoteException {
+		
+<span class="fc" id="L47">		return false;</span>
+	}
+	@Override
+	public int getElevatorDoorStatus(int elevatorNumber) throws RemoteException {
+		
+<span class="fc" id="L52">		return 1;</span>
+	}
+	@Override
+	public int getElevatorFloor(int elevatorNumber) throws RemoteException {
+		
+<span class="fc" id="L57">		return curentElevatorFloor;</span>
+	}
+	@Override
+	public int getElevatorNum() throws RemoteException {
+		
+<span class="fc" id="L62">		return 1;</span>
+	}
+	@Override
+	public int getElevatorPosition(int elevatorNumber) throws RemoteException {
+		
+<span class="nc" id="L67">		return 24;</span>
+	}
+	@Override
+	public int getElevatorSpeed(int elevatorNumber) throws RemoteException {
+		
+<span class="fc" id="L72">		return 4;</span>
+	}
+	@Override
+	public int getElevatorWeight(int elevatorNumber) throws RemoteException {
+<span class="fc" id="L76">		return 459;</span>
+	}
+	@Override
+	public int getElevatorCapacity(int elevatorNumber) throws RemoteException {
+		
+<span class="fc" id="L81">		return 10;</span>
+	}
+	@Override
+	public boolean getFloorButtonDown(int floor) throws RemoteException {
+		
+<span class="fc" id="L86">		return floorButtonDown.get(floor);</span>
+	}
+	@Override
+	public boolean getFloorButtonUp(int floor) throws RemoteException {
+		
+<span class="fc" id="L91">		return floorButtonUp.get(floor);</span>
+	}
+	@Override
+	public int getFloorHeight() throws RemoteException {
+		
+<span class="nc" id="L96">		return 8;</span>
+	}
+	@Override
+	public int getFloorNum() throws RemoteException {
+		
+<span class="fc" id="L101">		return target;</span>
+	}
+	@Override
+	public boolean getServicesFloors(int elevatorNumber, int floor)
+			throws RemoteException {
+		
+<span class="fc bfc" id="L107" title="All 2 branches covered.">		if( floors.get(floor) == null){</span>
+<span class="fc" id="L108">			floors.put(floor, true);</span>
+<span class="fc" id="L109">			return true;</span>
+		}else{
+<span class="fc" id="L111">			return floors.get(floor);</span>
+		}
+	}
+	@Override
+	public int getTarget(int elevatorNumber) throws RemoteException {
+<span class="fc" id="L116">		return target;</span>
+	}
+	@Override
+	public void setCommittedDirection(int elevatorNumber, int direction)
+			throws RemoteException {
+		
+<span class="fc" id="L122">		commitedDirection = direction;</span>
+<span class="fc" id="L123">	}</span>
+	@Override
+	public void setServicesFloors(int elevatorNumber, int floor, boolean service)
+			throws RemoteException {
+		
+<span class="fc" id="L128">		floors.put(floor, service);</span>
+<span class="fc" id="L129">	}</span>
+	@Override
+	public void setTarget(int elevatorNumber, int target) throws RemoteException {
+		
+<span class="fc" id="L133">		this.target= target;</span>
+		//startService();
+		
+<span class="fc" id="L136">	}</span>
+	@Override
+	public long getClockTick() throws RemoteException {
+		
+<span class="fc" id="L140">		return 1000;</span>
+	}
+	
+	/*public void startService(){
+		Runnable t = new Runnable() {
+			
+			@Override
+			public void run() {
+				while(true){
+					if(curentElevatorFloor != target){
+						if(target &gt; curentElevatorFloor){
+							curentElevatorFloor += 1;
+						}else{
+							curentElevatorFloor -= 1;
+						}
+					}else{
+						floorButtonDown.put(target, false);
+						floorButtonUp.put(target, false);
+						break;
+					}
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
+			}
+		};
+		t.run();*/
+//		Timer t = new Timer();
+//		t.schedule(new TimerTask() {
+//			
+//			@Override
+//			public void run() {
+//				// TODO Auto-generated method stub
+//				if(curentElevatorFloor != target){
+//					if(target &gt; curentElevatorFloor){
+//						curentElevatorFloor += 1;
+//					}else{
+//						curentElevatorFloor -= 1;
+//					}
+//				}
+//			}
+//		}, 10);
+		
+	//}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.2.201409121644</span>AllTests (7) (08.01.2015 22:40:07)</div></body></html>

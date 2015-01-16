@@ -2,7 +2,7 @@
 <Scenario>
 <Title>title</Title>
 <Description>description</Description>
-<Floors>3</Floors>
+<Floors>5</Floors>
 <FloorHeight>10</FloorHeight>
 <Elevators>1</Elevators>
 <ElevatorCapacity>10</ElevatorCapacity>

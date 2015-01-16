@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../.resources/report.gif" type="image/gif"/><title>ElevatorModel.java</title><link rel="stylesheet" href="../../../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../.sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">AllTests (7) (08.01.2015 22:40:07)</a> &gt; <a href="../../index.html" class="el_group">ElevatorControl</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">sqelevator.application.model</a> &gt; <span class="el_source">ElevatorModel.java</span></div><h1>ElevatorModel.java</h1><pre class="source lang-java linenums">package sqelevator.application.model;
+
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import sqelevator.IElevator;
+import sqelevator.application.service.ElevatorAdapter;
+
+
+<span class="fc" id="L11">public class ElevatorModel implements IElevatorModel{</span>
+	private int elevatorNumber;
+	private int speed;
+	private int weight;
+	private int capacity;
+	private int nextTargetFloor;
+<span class="fc" id="L17">	private HashMap&lt;Integer, Integer&gt; followingRequests = new HashMap&lt;Integer, Integer&gt;();</span>
+	private int doorStatus;
+	private int committedDirection;
+	private int elevatorFloorNumber;
+	private int totalFloorsNumber;
+<span class="fc" id="L22">	private ArrayList&lt;IFloor&gt; floors = new ArrayList&lt;IFloor&gt;();</span>
+<span class="fc" id="L23">	private boolean connected = false;</span>
+
+	/**
+	 * @return the elevatorFloorNumber
+	 */
+	public int getElevatorFloorNumber() {
+<span class="fc" id="L29">		return elevatorFloorNumber;</span>
+	}
+
+	/**
+	 * @param elevatorFloorNumber the elevatorFloorNumber to set
+	 */
+	public void setElevatorFloorNumber(int elevatorFloorNumber) {
+<span class="fc" id="L36">		this.elevatorFloorNumber = elevatorFloorNumber;</span>
+<span class="fc" id="L37">	}</span>
+	
+	@Override
+	public ArrayList&lt;IFloor&gt; getFloors() {
+<span class="fc" id="L41">		return floors;</span>
+	}
+
+	public void setFloors(ArrayList&lt;IFloor&gt; floors) {
+<span class="fc" id="L45">		this.floors = floors;</span>
+<span class="fc" id="L46">	}</span>
+
+	@Override
+	public int getElevatorNumber() {
+<span class="fc" id="L50">		return elevatorNumber;</span>
+	}
+
+	public void setElevatorNumber(int elevatorNumber) {
+<span class="fc" id="L54">		this.elevatorNumber = elevatorNumber;</span>
+<span class="fc" id="L55">	}</span>
+	
+	@Override
+	public int getSpeed() {
+<span class="nc" id="L59">		return speed;</span>
+	}
+
+	public void setSpeed(int speed) {
+<span class="fc" id="L63">		this.speed = speed;</span>
+<span class="fc" id="L64">	}</span>
+
+	@Override
+	public int getWeight() {
+<span class="nc" id="L68">		return weight;</span>
+	}
+
+	public void setWeight(int weight) {
+<span class="fc" id="L72">		this.weight = weight;</span>
+<span class="fc" id="L73">	}</span>
+
+	@Override
+	public int getCapacity() {
+<span class="nc" id="L77">		return capacity;</span>
+	}
+
+	public void setCapacity(int capacity) {
+<span class="fc" id="L81">		this.capacity = capacity;</span>
+<span class="fc" id="L82">	}</span>
+
+	@Override
+	public int getNextTargetFloor() {
+<span class="fc" id="L86">		return nextTargetFloor;</span>
+	}
+
+	public void setNextTargetFloor(int nextTargetFloor) {
+<span class="fc" id="L90">		this.nextTargetFloor = nextTargetFloor;</span>
+<span class="fc" id="L91">	}</span>
+
+	@Override
+	public HashMap&lt;Integer, Integer&gt; getFollowingRequests() {
+<span class="nc" id="L95">		return followingRequests;</span>
+	}
+
+	public void setFollowingRequests(HashMap&lt;Integer, Integer&gt; followingRequests) {
+<span class="fc" id="L99">		this.followingRequests = followingRequests;</span>
+<span class="fc" id="L100">	}</span>
+
+	@Override
+	public int getDoorStatus() {
+<span class="nc" id="L104">		return doorStatus;</span>
+	}
+
+	public void setDoorStatus(int doorStatus) {
+<span class="fc" id="L108">		this.doorStatus = doorStatus;</span>
+<span class="fc" id="L109">	}</span>
+	
+	@Override
+	public boolean isConnected(){
+<span class="fc" id="L113">		return this.connected;</span>
+	}
+	
+	public void setConnected(boolean isConnected){
+<span class="fc" id="L117">		this.connected = isConnected;</span>
+<span class="fc" id="L118">	}</span>
+
+	@Override
+	public int getCommittedDirection() {
+<span class="fc" id="L122">		return committedDirection;</span>
+	}
+
+	public void setCommittedDirection(int committedDirection) {
+<span class="fc" id="L126">		this.committedDirection = committedDirection;</span>
+<span class="fc" id="L127">	}</span>
+
+	@Override
+	public int getTotalFloorsNumber() {
+<span class="nc" id="L131">		return totalFloorsNumber;</span>
+	}
+
+	public void setTotalFloorsNumber(int totalFloorsNumber) {
+<span class="fc" id="L135">		this.totalFloorsNumber = totalFloorsNumber;</span>
+<span class="fc" id="L136">	}</span>
+	
+	@Override
+	public boolean elevatorCommands(ElevatorCommands cmd, Object... params){
+<span class="nc" id="L140">		IElevator controller = ElevatorAdapter.getElevatorRmiInstance();</span>
+<span class="nc bnc" id="L141" title="All 3 branches missed.">		switch(cmd){</span>
+			case SET_TARGET:{
+<span class="nc bnc" id="L143" title="All 2 branches missed.">				if(params[0] != null){</span>
+<span class="nc" id="L144">					int p[]=(int[])params[0];</span>
+<span class="nc" id="L145">					int elevatorNumber = (int) p[0];</span>
+<span class="nc" id="L146">					int target = (int) p[1];</span>
+			    try {
+<span class="nc" id="L148">					  controller.setTarget(elevatorNumber, target);</span>
+<span class="nc" id="L149">					} catch (RemoteException e) {</span>
+<span class="nc" id="L150">						e.printStackTrace();</span>
+<span class="nc" id="L151">						return false;</span>
+					}
+<span class="nc" id="L153">					return true;</span>
+				}
+<span class="nc" id="L155">				return false;</span>
+			}
+		
+			case SET_STOP_REQUEST:{
+<span class="nc bnc" id="L159" title="All 2 branches missed.">				if(params[0] != null </span>
+<span class="nc bnc" id="L160" title="All 4 branches missed.">						&amp;&amp; params[1] != null &amp;&amp; params[2] != null){</span>
+<span class="nc" id="L161">					int elevatorNumber = (int) params[0];</span>
+<span class="nc" id="L162">					int floor = (int) params[1];</span>
+<span class="nc" id="L163">					boolean service = (boolean) params[2]; </span>
+					try {
+<span class="nc" id="L165">						controller.setServicesFloors(elevatorNumber, floor, service);</span>
+<span class="nc" id="L166">					} catch (RemoteException e) {</span>
+<span class="nc" id="L167">						e.printStackTrace();</span>
+<span class="nc" id="L168">						return false;</span>
+					}
+<span class="nc" id="L170">					return true;</span>
+				}
+<span class="nc" id="L172">				return false;	</span>
+			}
+	
+			default:
+<span class="nc" id="L176">				return false;</span>
+		}
+	}
+	
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.2.201409121644</span>AllTests (7) (08.01.2015 22:40:07)</div></body></html>

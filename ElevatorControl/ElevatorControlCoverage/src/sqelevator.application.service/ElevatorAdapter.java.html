@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../.resources/report.gif" type="image/gif"/><title>ElevatorAdapter.java</title><link rel="stylesheet" href="../../../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../.sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">AllTests (7) (08.01.2015 22:40:07)</a> &gt; <a href="../../index.html" class="el_group">ElevatorControl</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">sqelevator.application.service</a> &gt; <span class="el_source">ElevatorAdapter.java</span></div><h1>ElevatorAdapter.java</h1><pre class="source lang-java linenums">package sqelevator.application.service;
+
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Observable;
+import java.util.Observer;
+
+import sqelevator.IElevator;
+import sqelevator.application.model.ElevatorModel;
+import sqelevator.application.model.Floor;
+import sqelevator.application.model.IElevatorModel;
+import sqelevator.application.model.IFloor;
+
+/**
+ * The Class ElevatorAdapter
+ * 
+ * @author Koller - S1310455008
+ */
+public class ElevatorAdapter extends Observable implements IElevatorAdapter {
+
+	/** The elevatorModel. */
+<span class="pc" id="L26">	private ElevatorModel elevatorModel = null;</span>
+	// private Floor floor = null;
+
+	/** The controller. */
+<span class="fc" id="L30">	private static IElevator controller = null;</span>
+
+	/** The rmi url. */
+<span class="pc" id="L33">	private String rmiURL = null;</span>
+
+	/** The connected. */
+<span class="pc" id="L36">	private boolean connected = false;</span>
+
+	/**
+	 * Instantiates a new elevator adapter.
+	 * 
+	 * @param rmiURL
+	 *            the rmi url
+	 * @param observers
+	 *            the observers
+	 */
+<span class="nc" id="L46">	public ElevatorAdapter(String rmiURL, ArrayList&lt;Observer&gt; observers) {</span>
+<span class="nc" id="L47">		elevatorModel = new ElevatorModel();</span>
+<span class="nc" id="L48">		this.rmiURL = rmiURL;</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">		for (Observer o : observers) {</span>
+<span class="nc" id="L50">			this.addObserver(o);</span>
+		}
+<span class="nc" id="L52">	}</span>
+
+<span class="fc" id="L54">	public ElevatorAdapter(IElevator controller, ArrayList&lt;Observer&gt; observers) {</span>
+<span class="fc" id="L55">		elevatorModel = new ElevatorModel();</span>
+<span class="fc" id="L56">		this.controller = controller;</span>
+<span class="fc" id="L57">		connected = true;</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">		for (Observer o : observers) {</span>
+<span class="fc" id="L59">			this.addObserver(o);</span>
+		}
+<span class="fc" id="L61">	}</span>
+
+	public void updateModels() {
+		try {
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">			if (controller.getElevatorNum() &gt; 0) {</span>
+<span class="fc" id="L66">				int elevatorNumber = 0;</span>
+				//set connected in model to true
+<span class="fc" id="L68">				elevatorModel.setConnected(true);</span>
+				
+<span class="fc" id="L70">				elevatorModel.setElevatorNumber(controller.getElevatorNum());</span>
+<span class="fc" id="L71">				elevatorModel.setCapacity(controller</span>
+<span class="fc" id="L72">						.getElevatorCapacity(elevatorNumber));</span>
+<span class="fc" id="L73">				elevatorModel.setCommittedDirection(controller</span>
+<span class="fc" id="L74">						.getCommittedDirection(elevatorNumber));</span>
+<span class="fc" id="L75">				elevatorModel.setDoorStatus(controller</span>
+<span class="fc" id="L76">						.getElevatorDoorStatus(elevatorNumber));</span>
+<span class="fc" id="L77">				elevatorModel.setNextTargetFloor(controller</span>
+<span class="fc" id="L78">						.getTarget(elevatorNumber));</span>
+<span class="fc" id="L79">				elevatorModel.setSpeed(controller</span>
+<span class="fc" id="L80">						.getElevatorSpeed(elevatorNumber));</span>
+<span class="fc" id="L81">				elevatorModel.setWeight(controller</span>
+<span class="fc" id="L82">						.getElevatorWeight(elevatorNumber));</span>
+<span class="fc" id="L83">				elevatorModel.setElevatorFloorNumber(controller</span>
+<span class="fc" id="L84">						.getElevatorFloor(elevatorNumber));</span>
+
+<span class="fc" id="L86">				elevatorModel.setTotalFloorsNumber(controller.getFloorNum());</span>
+<span class="fc" id="L87">				int numOfFloors = controller.getFloorNum();</span>
+<span class="fc" id="L88">				HashMap&lt;Integer, Integer&gt; requests = new HashMap&lt;Integer, Integer&gt;();</span>
+<span class="fc" id="L89">				ArrayList&lt;IFloor&gt; floors = new ArrayList&lt;IFloor&gt;();</span>
+				Floor floor;
+<span class="fc bfc" id="L91" title="All 2 branches covered.">				for (int i = 0; i &lt; numOfFloors; i++) {</span>
+<span class="fc" id="L92">					floor = new Floor();</span>
+<span class="fc" id="L93">					boolean isDown = controller.getFloorButtonDown(i);</span>
+<span class="fc" id="L94">					boolean isUp = controller.getFloorButtonUp(i);</span>
+<span class="pc bpc" id="L95" title="3 of 4 branches missed.">					if (isUp &amp;&amp; isDown) {</span>
+<span class="nc" id="L96">						floor.setDirection(3);</span>
+<span class="nc" id="L97">						requests.put(i, 3);</span>
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">					} else if (isDown) {</span>
+<span class="nc" id="L99">						floor.setDirection(1);</span>
+<span class="nc" id="L100">						requests.put(i, 1);</span>
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">					} else if (isUp) {</span>
+<span class="nc" id="L102">						floor.setDirection(0);</span>
+<span class="nc" id="L103">						requests.put(i, 0);</span>
+<span class="nc" id="L104">					} else {</span>
+						// neither up or down
+<span class="fc" id="L106">						floor.setDirection(2);</span>
+					}
+
+<span class="fc" id="L109">					floor.setFloorNumber(i);</span>
+
+<span class="fc" id="L111">					floor.setTarget(controller.getServicesFloors(</span>
+<span class="fc" id="L112">							elevatorNumber, i));</span>
+
+<span class="fc" id="L114">					floors.add(floor);</span>
+
+				}
+<span class="fc" id="L117">				elevatorModel.setFloors(floors);</span>
+<span class="fc" id="L118">				elevatorModel.setFollowingRequests(requests);</span>
+			}
+<span class="pc" id="L120">		} catch (Exception e) {</span>
+<span class="nc" id="L121">			connected = false;</span>
+			//set connected in model to true
+<span class="nc" id="L123">			elevatorModel.setConnected(false);</span>
+<span class="nc" id="L124">			e.printStackTrace();</span>
+		}
+<span class="fc" id="L126">		setChanged();</span>
+<span class="fc" id="L127">		notifyObservers((IElevatorModel) elevatorModel);</span>
+<span class="fc" id="L128">	}</span>
+
+	@Override
+	public boolean isConnected() {
+<span class="nc" id="L132">		return connected;</span>
+	}
+
+	public static IElevator getElevatorRmiInstance() {
+<span class="nc" id="L136">		return controller;</span>
+	}
+
+	public boolean connect() {
+		try {
+<span class="nc bnc" id="L141" title="All 2 branches missed.">			if (!connected) {</span>
+<span class="nc" id="L142">				controller = (IElevator) Naming.lookup(rmiURL);</span>
+<span class="nc" id="L143">				connected = true;</span>
+			}
+<span class="nc" id="L145">		} catch (Exception e) {</span>
+<span class="nc" id="L146">			connected = false;</span>
+<span class="nc" id="L147">			elevatorModel.setConnected(false);</span>
+<span class="nc" id="L148">			e.printStackTrace();</span>
+		}
+<span class="nc" id="L150">		return connected;</span>
+	}
+
+	public ElevatorModel getElevatorModel() {
+<span class="fc" id="L154">		return elevatorModel;</span>
+	}
+
+	public IElevator getIElevator() {
+<span class="nc" id="L158">		return controller;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.2.201409121644</span>AllTests (7) (08.01.2015 22:40:07)</div></body></html>

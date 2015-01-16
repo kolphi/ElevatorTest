@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../.resources/report.gif" type="image/gif"/><title>MockupElevatorRMI.java</title><link rel="stylesheet" href="../../../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../.sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">AllTests (7) (08.01.2015 22:40:07)</a> &gt; <a href="../../index.html" class="el_group">ElevatorControl</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">sqelevator</a> &gt; <span class="el_source">MockupElevatorRMI.java</span></div><h1>MockupElevatorRMI.java</h1><pre class="source lang-java linenums">
+package sqelevator;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
+/**
+ * Remote Class for the &quot;Hello, world!&quot; example.
+ */
+public class MockupElevatorRMI extends UnicastRemoteObject implements IElevator {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private String message;
+<span class="nc" id="L16">	private int target=0;</span>
+<span class="nc" id="L17">	private int commitedDirection = 0;</span>
+<span class="nc" id="L18">	private int floorNum = 100;</span>
+<span class="nc" id="L19">	private HashMap&lt;Integer,Boolean&gt; floors = new HashMap&lt;Integer,Boolean&gt;(floorNum);</span>
+	
+	protected MockupElevatorRMI() throws RemoteException {
+<span class="nc" id="L22">		super();</span>
+<span class="nc" id="L23">	}</span>
+	
+	@Override
+	public int getCommittedDirection(int elevatorNumber) throws RemoteException {
+<span class="nc" id="L27">		return commitedDirection;</span>
+	}
+	@Override
+	public int getElevatorAccel(int elevatorNumber) throws RemoteException {
+		
+<span class="nc" id="L32">		return 5;</span>
+	}
+	@Override
+	public boolean getElevatorButton(int elevatorNumber, int floor)
+			throws RemoteException {
+		
+<span class="nc" id="L38">		return false;</span>
+	}
+	@Override
+	public int getElevatorDoorStatus(int elevatorNumber) throws RemoteException {
+		
+<span class="nc" id="L43">		return 1;</span>
+	}
+	@Override
+	public int getElevatorFloor(int elevatorNumber) throws RemoteException {
+		
+<span class="nc" id="L48">		return target;</span>
+	}
+	@Override
+	public int getElevatorNum() throws RemoteException {
+		
+<span class="nc" id="L53">		return 12;</span>
+	}
+	@Override
+	public int getElevatorPosition(int elevatorNumber) throws RemoteException {
+		
+<span class="nc" id="L58">		return 24;</span>
+	}
+	@Override
+	public int getElevatorSpeed(int elevatorNumber) throws RemoteException {
+		
+<span class="nc" id="L63">		return 4;</span>
+	}
+	@Override
+	public int getElevatorWeight(int elevatorNumber) throws RemoteException {
+<span class="nc" id="L67">		return 459;</span>
+	}
+	@Override
+	public int getElevatorCapacity(int elevatorNumber) throws RemoteException {
+		
+<span class="nc" id="L72">		return 10;</span>
+	}
+	@Override
+	public boolean getFloorButtonDown(int floor) throws RemoteException {
+		
+<span class="nc" id="L77">		return true;</span>
+	}
+	@Override
+	public boolean getFloorButtonUp(int floor) throws RemoteException {
+		
+<span class="nc" id="L82">		return true;</span>
+	}
+	@Override
+	public int getFloorHeight() throws RemoteException {
+		
+<span class="nc" id="L87">		return 8;</span>
+	}
+	@Override
+	public int getFloorNum() throws RemoteException {
+		
+<span class="nc" id="L92">		return floorNum;</span>
+	}
+	@Override
+	public boolean getServicesFloors(int elevatorNumber, int floor)
+			throws RemoteException {
+		
+<span class="nc bnc" id="L98" title="All 2 branches missed.">		if( floors.get(floor) == null){</span>
+<span class="nc" id="L99">			floors.put(floor, true);</span>
+<span class="nc" id="L100">			return true;</span>
+		}else{
+<span class="nc" id="L102">			return floors.get(floor);</span>
+		}
+	}
+	@Override
+	public int getTarget(int elevatorNumber) throws RemoteException {
+		
+<span class="nc" id="L108">		return target;</span>
+	}
+	@Override
+	public void setCommittedDirection(int elevatorNumber, int direction)
+			throws RemoteException {
+		
+<span class="nc" id="L114">		commitedDirection = direction;</span>
+<span class="nc" id="L115">	}</span>
+	@Override
+	public void setServicesFloors(int elevatorNumber, int floor, boolean service)
+			throws RemoteException {
+		
+<span class="nc" id="L120">		floors.put(floor, service);</span>
+<span class="nc" id="L121">	}</span>
+	@Override
+	public void setTarget(int elevatorNumber, int target) throws RemoteException {
+		
+<span class="nc" id="L125">		this.target= target; </span>
+<span class="nc" id="L126">	}</span>
+	@Override
+	public long getClockTick() throws RemoteException {
+		
+<span class="nc" id="L130">		return 1000;</span>
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.2.201409121644</span>AllTests (7) (08.01.2015 22:40:07)</div></body></html>

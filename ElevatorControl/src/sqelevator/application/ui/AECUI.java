@@ -33,7 +33,7 @@ public class AECUI extends JFrame implements Observer, ActionListener {
 	private static final String ICON_SPEED = "res/speedometer-32.png";
 	private static final String ICON_DOORS_OPEN = "res/door-open-64.png";
 	private static final String ICON_DOORS_CLOSED = "res/door-closed-64.png";
-	private static final int FLOOR_COUNT = 10;
+	private static final int FLOOR_COUNT = 5;
 
 	private IElevatorModel model = null;
 	private JLabel lWeight, lSpeed, lConnection;
@@ -127,6 +127,7 @@ public class AECUI extends JFrame implements Observer, ActionListener {
 
 		// add manual control
 		cbManualControl = new JCheckBox("Manual Control");
+		cbManualControl.setSelected(true);
 		lConnection = new JLabel("Connection ?");
 		JPanel pControl = new JPanel();
 		pControl.add(cbManualControl);
@@ -230,29 +231,28 @@ public class AECUI extends JFrame implements Observer, ActionListener {
 
 				}
 			}
-
-			// if(cbManual.isSelected()){
-			// currentFloor = model.getElevatorFloorNumber();
-			// if(currentFloor == target || switchBackToAutoMode){
-			// int
-			// elevatorNum=Integer.parseInt(comboElevatorNumber.getSelectedItem().toString());
-			// setElevatorTarget(new int[]{elevatorNum-1,target});
-			// setFloorService(new Object[]{elevatorNum-1,target, true});
-			// switchBackToAutoMode = false;
-			// }
-			//
-			// }
-			// model.setElevatorPosition(model.getElevatorFloorNumber(),
-			// model.getCommittedDirection());
-			// setFloorrButtonStatus(floorNumber, requestedDirection);
-			System.out.println("ElevatorUI: " + model.getElevatorNumber()
-					+ " direction:" + model.getCommittedDirection() + " floor:"
-					+ model.getElevatorFloorNumber());
+//			System.out.println("ElevatorUI: " + model.getElevatorNumber()
+//					+ " direction:" + model.getCommittedDirection() + " floor:"
+//					+ model.getElevatorFloorNumber());
+//			if(model.getElevatorFloorNumber() == model.getNextTargetFloor()){
+//				setDirectionStatus(new int[] { 0, model.getElevatorFloorNumber()});
+//			}
 		}
 	}
 
 	public void setElevatorTarget(int[] param) {
 		boolean cmdSent = model.elevatorCommands(ElevatorCommands.SET_TARGET,
+				param);
+		if (!cmdSent) {
+			System.out.println("Error Occured while processing your request !");
+			// JOptionPane.showMessageDialog(this,"Error Occured while processing your request !");
+		} else {
+			System.out.println("Succesful !" + param[0] + " " + param[1]);
+			// JOptionPane.showMessageDialog(this, "Succesful !");
+		}
+	}
+	public void setDirectionStatus(int[] param) {
+		boolean cmdSent = model.elevatorCommands(ElevatorCommands.SET_COMMITED_DIR,
 				param);
 		if (!cmdSent) {
 			System.out.println("Error Occured while processing your request !");
@@ -280,6 +280,7 @@ public class AECUI extends JFrame implements Observer, ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		int n = Integer.valueOf(e.getActionCommand());
 		setElevatorTarget(new int[] { 0, n });
+		setDirectionStatus(new int[] { 0, n });
 	}
 
 }

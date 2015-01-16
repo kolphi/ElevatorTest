@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../.resources/report.gif" type="image/gif"/><title>ElevatorTest.java</title><link rel="stylesheet" href="../../../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../.sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">AllTests (7) (08.01.2015 22:40:07)</a> &gt; <a href="../../index.html" class="el_group">ElevatorControl</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">sqelevator.test</a> &gt; <span class="el_source">ElevatorTest.java</span></div><h1>ElevatorTest.java</h1><pre class="source lang-java linenums"><span class="fc" id="L1">package sqelevator.test;</span>
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Observer;
+
+import junit.framework.Assert;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import sqelevator.IElevator;
+import sqelevator.TestMockupElevatorRMI;
+import sqelevator.application.service.ElevatorAdapter;
+import sqelevator.application.ui.AECUI;
+
+/**
+ * Test class for Elevator manual mode
+ */
+<span class="fc" id="L25">public class ElevatorTest {</span>
+<span class="fc" id="L26">	private ElevatorAdapter adapter = null;</span>
+	private static final String MOCK_RMI_SERVER_URL = &quot;rmi://localhost/sqelevator.MockupElevatorRMI&quot;;
+	// private static final String MOCK_RMI_SERVER_URL =
+	// &quot;rmi://localhost/ElevatorSim&quot;;
+<span class="fc" id="L30">	private AECUI elevatorUI = new AECUI();</span>
+<span class="fc" id="L31">	private IElevator controller = null;</span>
+
+	private static final boolean RUN_TESTS_WITHOUT_SERVER = true;
+
+	@Before
+	public void setUp() throws Exception {
+<span class="fc" id="L37">		ArrayList&lt;Observer&gt; observers = new ArrayList&lt;Observer&gt;();</span>
+<span class="fc" id="L38">		observers.add(elevatorUI);</span>
+
+		if (RUN_TESTS_WITHOUT_SERVER) {
+<span class="fc" id="L41">			controller = new TestMockupElevatorRMI();</span>
+<span class="fc" id="L42">			adapter = new ElevatorAdapter(controller, observers);</span>
+		} else {
+			adapter = new ElevatorAdapter(MOCK_RMI_SERVER_URL, observers);
+			adapter.connect();
+			controller = ElevatorAdapter.getElevatorRmiInstance();
+		}
+<span class="fc" id="L48">	}</span>
+
+	@Test
+	public void testElevatorConnectionNull() {
+<span class="fc" id="L52">		controller = null;</span>
+<span class="fc" id="L53">		ArrayList&lt;Observer&gt; observers = new ArrayList&lt;Observer&gt;();</span>
+<span class="fc" id="L54">		observers.add(elevatorUI);</span>
+<span class="fc" id="L55">		adapter = new ElevatorAdapter(controller, observers);</span>
+<span class="fc" id="L56">		assertFalse(adapter.getElevatorModel().isConnected());</span>
+<span class="fc" id="L57">	}</span>
+
+	@Test
+	public void testElevatorConnectionEstablished() {
+<span class="fc" id="L61">		adapter.updateModels();</span>
+<span class="fc" id="L62">		assertTrue(adapter.getElevatorModel().isConnected());</span>
+<span class="fc" id="L63">	}</span>
+
+	@Test
+	public void testGetCommittedDirection() {
+		try {
+<span class="fc" id="L68">			int elevatorNumber = 0;</span>
+<span class="fc" id="L69">			int direction = controller.getCommittedDirection(elevatorNumber);</span>
+<span class="pc bpc" id="L70" title="5 of 6 branches missed.">			assertTrue(direction == 0 || direction == 1 || direction == 2);</span>
+<span class="pc" id="L71">		} catch (RemoteException e) {</span>
+<span class="nc" id="L72">			e.printStackTrace();</span>
+<span class="nc" id="L73">			Assert.fail(&quot;Remote connection error.&quot;);</span>
+		}
+<span class="fc" id="L75">	}</span>
+
+	@Test
+	public void testElevatorDirection() {
+		try {
+<span class="fc" id="L80">			int elevatorNumber = 0;</span>
+<span class="fc" id="L81">			int currentFloor = controller.getElevatorFloor(elevatorNumber);</span>
+<span class="fc" id="L82">			int direction = controller.getCommittedDirection(elevatorNumber);</span>
+<span class="fc" id="L83">			int nextFloor = controller.getTarget(elevatorNumber);</span>
+<span class="pc bpc" id="L84" title="3 of 4 branches missed.">			if (direction == 0 || direction == 1) {</span>
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">				if (nextFloor &gt; currentFloor) {</span>
+<span class="nc" id="L86">					assertEquals(direction, 0);</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">				} else if (nextFloor &lt; currentFloor) {</span>
+<span class="nc" id="L88">					assertEquals(direction, 1);</span>
+				}
+			}
+<span class="nc" id="L91">		} catch (RemoteException e) {</span>
+<span class="nc" id="L92">			e.printStackTrace();</span>
+<span class="nc" id="L93">			Assert.fail(&quot;Remote connection error.&quot;);</span>
+		}
+<span class="fc" id="L95">	}</span>
+
+	@Test
+	public void testSetCommittedDirection() {
+<span class="fc" id="L99">		int expectedDirection = 0;</span>
+		try {
+<span class="fc" id="L101">			int elevatorNumber = 0;</span>
+<span class="fc" id="L102">			controller.setCommittedDirection(elevatorNumber, expectedDirection);</span>
+<span class="fc" id="L103">			adapter.updateModels();</span>
+<span class="fc" id="L104">			int actualDirection = controller</span>
+<span class="fc" id="L105">					.getCommittedDirection(elevatorNumber);</span>
+<span class="fc" id="L106">			assertEquals(expectedDirection, actualDirection);</span>
+<span class="fc" id="L107">			actualDirection = adapter.getElevatorModel()</span>
+<span class="fc" id="L108">					.getCommittedDirection();</span>
+<span class="fc" id="L109">			assertEquals(expectedDirection, actualDirection);</span>
+<span class="pc" id="L110">		} catch (RemoteException e) {</span>
+<span class="nc" id="L111">			e.printStackTrace();</span>
+<span class="nc" id="L112">			Assert.fail(&quot;Remote connection error.&quot;);</span>
+		}
+<span class="fc" id="L114">	}</span>
+
+	@Test
+	public void testSetServicesFloors() {
+<span class="fc" id="L118">		int expectedFloor = 3;</span>
+<span class="fc" id="L119">		boolean expectedService = false;</span>
+		try {
+<span class="fc" id="L121">			int elevatorNumber = 0;</span>
+<span class="fc" id="L122">			controller.setServicesFloors(elevatorNumber, expectedFloor,</span>
+<span class="fc" id="L123">					expectedService);</span>
+<span class="fc" id="L124">			boolean actualService = controller.getServicesFloors(</span>
+<span class="fc" id="L125">					elevatorNumber, expectedFloor);</span>
+<span class="fc" id="L126">			assertEquals(expectedService, actualService);</span>
+<span class="pc" id="L127">		} catch (RemoteException e) {</span>
+<span class="nc" id="L128">			e.printStackTrace();</span>
+<span class="nc" id="L129">			Assert.fail(&quot;Remote connection error.&quot;);</span>
+		}
+<span class="fc" id="L131">	}</span>
+
+	@Test
+	public void testGetElevatorDoorStatus() {
+		try {
+<span class="fc" id="L136">			int elevatorNumber = 0;</span>
+<span class="fc" id="L137">			int status = controller.getElevatorDoorStatus(elevatorNumber);</span>
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">			if (status == 1) {</span>
+<span class="fc" id="L139">				int floor = controller.getElevatorFloor(elevatorNumber);</span>
+<span class="fc" id="L140">				boolean service = controller.getServicesFloors(elevatorNumber,</span>
+<span class="fc" id="L141">						floor);</span>
+<span class="fc" id="L142">				assertTrue(service == true);</span>
+			}
+<span class="pc" id="L144">		} catch (RemoteException e) {</span>
+<span class="nc" id="L145">			e.printStackTrace();</span>
+<span class="nc" id="L146">			Assert.fail(&quot;Remote connection error.&quot;);</span>
+		}
+<span class="fc" id="L148">	}</span>
+
+	@Test
+	public void testSetTarget() {
+<span class="fc" id="L152">		int expectedTarget = 10;</span>
+		try {
+<span class="fc" id="L154">			int elevatorNumber = 0;</span>
+<span class="fc" id="L155">			controller.setTarget(elevatorNumber, expectedTarget);</span>
+<span class="fc" id="L156">			int actualTarget = controller.getTarget(elevatorNumber);</span>
+<span class="fc" id="L157">			assertEquals(expectedTarget, actualTarget);</span>
+<span class="fc" id="L158">			adapter.updateModels();</span>
+<span class="fc" id="L159">			actualTarget = adapter.getElevatorModel().getNextTargetFloor();</span>
+<span class="fc" id="L160">			assertEquals(expectedTarget, actualTarget);</span>
+<span class="pc" id="L161">		} catch (RemoteException e) {</span>
+<span class="nc" id="L162">			e.printStackTrace();</span>
+<span class="nc" id="L163">			Assert.fail(&quot;Remote connection error.&quot;);</span>
+		}
+<span class="fc" id="L165">	}</span>
+
+	@Test
+	public void testGetElevatorButton() {
+<span class="fc" id="L169">		int floor = 0;</span>
+		try {
+<span class="fc" id="L171">			int elevatorNumber = 0;</span>
+<span class="fc" id="L172">			boolean btnPressed = controller.getElevatorButton(elevatorNumber,</span>
+<span class="fc" id="L173">					floor);</span>
+<span class="fc" id="L174">			assertNotNull(btnPressed);</span>
+<span class="pc" id="L175">		} catch (RemoteException e) {</span>
+<span class="nc" id="L176">			e.printStackTrace();</span>
+<span class="nc" id="L177">			Assert.fail(&quot;Remote connection error.&quot;);</span>
+		}
+<span class="fc" id="L179">	}</span>
+
+	@Test
+	public void testGetFloorButtonDown() {
+<span class="fc" id="L183">		int floor = 0;</span>
+		try {
+<span class="fc" id="L185">			int elevatorNumber = 0;</span>
+<span class="fc" id="L186">			boolean btnPressed = controller.getFloorButtonDown(floor);</span>
+<span class="fc" id="L187">			assertNotNull(btnPressed);</span>
+<span class="pc" id="L188">		} catch (RemoteException e) {</span>
+<span class="nc" id="L189">			e.printStackTrace();</span>
+<span class="nc" id="L190">			Assert.fail(&quot;Remote connection error.&quot;);</span>
+		}
+<span class="fc" id="L192">	}</span>
+
+	@Test
+	public void testGetFloorButtonUp() {
+<span class="fc" id="L196">		int floor = 0;</span>
+		try {
+<span class="fc" id="L198">			int elevatorNumber = 0;</span>
+<span class="fc" id="L199">			boolean btnPressed = controller.getFloorButtonUp(floor);</span>
+<span class="fc" id="L200">			assertNotNull(btnPressed);</span>
+<span class="pc" id="L201">		} catch (RemoteException e) {</span>
+			// TODO Auto-generated catch block
+<span class="nc" id="L203">			e.printStackTrace();</span>
+<span class="nc" id="L204">			Assert.fail(&quot;Remote connection error.&quot;);</span>
+		}
+<span class="fc" id="L206">	}</span>
+
+	@Test
+	public void testElevatorTarget() {
+<span class="fc" id="L210">		int target = 2;</span>
+		try {
+<span class="fc" id="L212">			int eleveatorNum = 0;</span>
+<span class="fc" id="L213">			controller.setTarget(eleveatorNum, target);</span>
+
+			// Refresh delay
+<span class="fc" id="L216">			final long refreshRate = controller.getClockTick();</span>
+<span class="fc" id="L217">			new Thread(new Runnable() {</span>
+				@Override
+				public void run() {
+					try {
+<span class="nc" id="L221">						Thread.sleep(refreshRate);</span>
+<span class="nc" id="L222">					} catch (InterruptedException e) {</span>
+						// TODO Auto-generated catch block
+<span class="nc" id="L224">						e.printStackTrace();</span>
+					}
+<span class="nc" id="L226">				}</span>
+			});
+
+<span class="fc" id="L229">			assertEquals(target, controller.getTarget(eleveatorNum));</span>
+<span class="fc" id="L230">			adapter.updateModels();</span>
+<span class="fc" id="L231">			assertEquals(target, adapter.getElevatorModel()</span>
+<span class="fc" id="L232">					.getNextTargetFloor());</span>
+<span class="pc" id="L233">		} catch (RemoteException e) {</span>
+<span class="nc" id="L234">			e.printStackTrace();</span>
+<span class="nc" id="L235">			Assert.fail(&quot;Remote connection error.&quot;);</span>
+		}
+
+<span class="fc" id="L238">	}</span>
+
+	@Test
+	public void testGetClockTick() {
+		long actual;
+		try {
+<span class="fc" id="L244">			actual = controller.getClockTick();</span>
+<span class="pc bpc" id="L245" title="1 of 2 branches missed.">			assertTrue(actual &gt;= 0);</span>
+<span class="pc" id="L246">		} catch (RemoteException e) {</span>
+			// TODO Auto-generated catch block
+<span class="nc" id="L248">			e.printStackTrace();</span>
+<span class="nc" id="L249">			Assert.fail(&quot;Remote connection error.&quot;);</span>
+		}
+<span class="fc" id="L251">	}</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.2.201409121644</span>AllTests (7) (08.01.2015 22:40:07)</div></body></html>

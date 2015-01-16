@@ -108,9 +108,9 @@ public class ElevatorAdapter extends Observable implements IElevatorAdapter {
 
 					floor.setFloorNumber(i);
 
-					floor.setTarget(controller.getServicesFloors(
+					floor.setTarget(controller.getElevatorButton(
 							elevatorNumber, i));
-
+					System.out.println("service floor number: " + i + " is checked " + controller.getElevatorButton(elevatorNumber, i));
 					floors.add(floor);
 
 				}

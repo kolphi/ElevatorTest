@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="de"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../../.resources/report.gif" type="image/gif"/><title>AECUI.java</title><link rel="stylesheet" href="../../../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../../.sessions.html" class="el_session">Sessions</a></span><a href="../../../index.html" class="el_report">AllTests (7) (08.01.2015 22:40:07)</a> &gt; <a href="../../index.html" class="el_group">ElevatorControl</a> &gt; <a href="../index.html" class="el_bundle">src</a> &gt; <a href="index.source.html" class="el_package">sqelevator.application.ui</a> &gt; <span class="el_source">AECUI.java</span></div><h1>AECUI.java</h1><pre class="source lang-java linenums">package sqelevator.application.ui;
+
+import java.awt.Color;
+import java.awt.Font;
+import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.SwingConstants;
+
+import sqelevator.IElevator;
+import sqelevator.application.model.ElevatorCommands;
+import sqelevator.application.model.FloorCommands;
+import sqelevator.application.model.IElevatorModel;
+import sqelevator.application.model.IFloor;
+
+public class AECUI extends JFrame implements Observer, ActionListener {
+
+	private static final long serialVersionUID = -8986012443059217901L;
+	private static final String ICON_WEIGHT = &quot;res/balance-32.png&quot;;
+	private static final String ICON_SPEED = &quot;res/speedometer-32.png&quot;;
+	private static final String ICON_DOORS_OPEN = &quot;res/door-open-64.png&quot;;
+	private static final String ICON_DOORS_CLOSED = &quot;res/door-closed-64.png&quot;;
+	private static final int FLOOR_COUNT = 3;
+
+<span class="fc" id="L38">	private IElevatorModel model = null;</span>
+	private JLabel lWeight, lSpeed, lConnection;
+	private JCheckBox cbManualControl;
+	private ImageIcon iiWeight, iiSpeed, iiDoors;
+	private DirectionsUIElement deCurrentDirection;
+	private DirectionsUIElement[] deFloors;
+	private JButton[] bFloors;
+	private JRadioButton[] rbFloors;
+<span class="fc" id="L46">	private boolean uiLoaded = false;</span>
+
+	public AECUI() {
+
+<span class="fc" id="L50">		super(&quot;Elevator Control&quot;);</span>
+		// setup layout
+<span class="fc" id="L52">		getContentPane().setLayout(</span>
+<span class="fc" id="L53">				new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));</span>
+<span class="fc" id="L54">		setDefaultCloseOperation(EXIT_ON_CLOSE);</span>
+
+		// add weight and speed panel
+<span class="fc" id="L57">		JPanel pWeightSpeed = new JPanel();</span>
+<span class="fc" id="L58">		iiWeight = new ImageIcon(getClass().getClassLoader().getResource(</span>
+<span class="fc" id="L59">				ICON_WEIGHT));</span>
+<span class="fc" id="L60">		iiSpeed = new ImageIcon(getClass().getClassLoader().getResource(</span>
+<span class="fc" id="L61">				ICON_SPEED));</span>
+<span class="fc" id="L62">		iiDoors = new ImageIcon(getClass().getClassLoader().getResource(</span>
+<span class="fc" id="L63">				ICON_DOORS_CLOSED));</span>
+<span class="fc" id="L64">		lWeight = new JLabel(&quot;0 kg&quot;);</span>
+<span class="fc" id="L65">		lSpeed = new JLabel(&quot;0 m/s&quot;);</span>
+
+<span class="fc" id="L67">		pWeightSpeed.add(new JLabel(iiWeight));</span>
+<span class="fc" id="L68">		pWeightSpeed.add(lWeight);</span>
+<span class="fc" id="L69">		pWeightSpeed.add(Box.createRigidArea(new Dimension(20, 0)));</span>
+<span class="fc" id="L70">		pWeightSpeed.add(new JLabel(iiSpeed));</span>
+<span class="fc" id="L71">		pWeightSpeed.add(lSpeed);</span>
+
+<span class="fc" id="L73">		add(pWeightSpeed);</span>
+
+		// add door and direction panel
+<span class="fc" id="L76">		JPanel pDoorDirection = new JPanel();</span>
+<span class="fc" id="L77">		JPanel pDoorState = new JPanel();</span>
+<span class="fc" id="L78">		pDoorState.setLayout(new BoxLayout(pDoorState, BoxLayout.Y_AXIS));</span>
+<span class="fc" id="L79">		pDoorState.add(new JLabel(&quot;Doors&quot;));</span>
+<span class="fc" id="L80">		pDoorState.add(new JLabel(iiDoors));</span>
+<span class="fc" id="L81">		pDoorDirection.add(pDoorState);</span>
+<span class="fc" id="L82">		pDoorDirection.add(Box.createRigidArea(new Dimension(20, 0)));</span>
+<span class="fc" id="L83">		JPanel pCurrentDirection = new JPanel();</span>
+<span class="fc" id="L84">		pCurrentDirection.setLayout(new BoxLayout(pCurrentDirection,</span>
+<span class="fc" id="L85">				BoxLayout.Y_AXIS));</span>
+<span class="fc" id="L86">		deCurrentDirection = new DirectionsUIElement();</span>
+<span class="fc" id="L87">		pCurrentDirection.add(new JLabel(&quot;Direction&quot;));</span>
+<span class="fc" id="L88">		pCurrentDirection.add(deCurrentDirection);</span>
+<span class="fc" id="L89">		pDoorDirection.add(pCurrentDirection);</span>
+
+<span class="fc" id="L91">		add(pDoorDirection);</span>
+
+		// add floors
+<span class="fc" id="L94">		JPanel pFloors = new JPanel();</span>
+<span class="fc" id="L95">		pFloors.setLayout(new BoxLayout(pFloors, BoxLayout.Y_AXIS));</span>
+<span class="fc" id="L96">		JPanel[] pFloor = new JPanel[FLOOR_COUNT];</span>
+<span class="fc" id="L97">		deFloors = new DirectionsUIElement[FLOOR_COUNT];</span>
+<span class="fc" id="L98">		bFloors = new JButton[FLOOR_COUNT];</span>
+<span class="fc" id="L99">		rbFloors = new JRadioButton[FLOOR_COUNT];</span>
+
+<span class="fc bfc" id="L101" title="All 2 branches covered.">		for (int n = 0; n &lt; FLOOR_COUNT; n++) {</span>
+<span class="fc" id="L102">			JPanel floor = new JPanel();</span>
+<span class="fc" id="L103">			floor.setLayout(new BoxLayout(floor, BoxLayout.X_AXIS));</span>
+<span class="fc" id="L104">			deFloors[n] = new DirectionsUIElement();</span>
+<span class="fc" id="L105">			bFloors[n] = new JButton(&quot;Floor &quot; + n);</span>
+<span class="fc" id="L106">			bFloors[n].setActionCommand(&quot;&quot; + n);</span>
+<span class="fc" id="L107">			bFloors[n].addActionListener(this);</span>
+<span class="fc" id="L108">			rbFloors[n] = new JRadioButton(&quot;&quot;);</span>
+<span class="fc" id="L109">			rbFloors[n].setSelected(false);</span>
+<span class="fc" id="L110">			floor.add(deFloors[n]);</span>
+<span class="fc" id="L111">			floor.add(Box.createRigidArea(new Dimension(20, 0)));</span>
+<span class="fc" id="L112">			floor.add(bFloors[n]);</span>
+<span class="fc" id="L113">			floor.add(Box.createRigidArea(new Dimension(20, 0)));</span>
+<span class="fc" id="L114">			floor.add(rbFloors[n]);</span>
+
+<span class="fc" id="L116">			pFloor[n] = floor;</span>
+
+<span class="fc" id="L118">			JPanel floor_bound = new JPanel();</span>
+<span class="fc" id="L119">			floor_bound.add(floor);</span>
+
+<span class="fc" id="L121">			pFloor[n] = floor_bound;</span>
+
+<span class="fc" id="L123">			pFloors.add(pFloor[n], 0);</span>
+		}
+
+<span class="fc" id="L126">		add(pFloors);</span>
+
+		// add manual control
+<span class="fc" id="L129">		cbManualControl = new JCheckBox(&quot;Manual Control&quot;);</span>
+<span class="fc" id="L130">		lConnection = new JLabel(&quot;Connection ?&quot;);</span>
+<span class="fc" id="L131">		JPanel pControl = new JPanel();</span>
+<span class="fc" id="L132">		pControl.add(cbManualControl);</span>
+<span class="fc" id="L133">		pControl.add(lConnection);</span>
+<span class="fc" id="L134">		add(pControl);</span>
+
+		// pack and show
+<span class="fc" id="L137">		pack();</span>
+<span class="fc" id="L138">		setMinimumSize(getSize());</span>
+<span class="fc" id="L139">		setSize(getWidth() + 40, getHeight() + 30);</span>
+<span class="fc" id="L140">		setVisible(true);</span>
+<span class="fc" id="L141">	}</span>
+
+	@Override
+	public void update(Observable o, Object arg) {
+		// synchronized (this) {
+
+		ArrayList&lt;IFloor&gt; floors;
+<span class="pc bpc" id="L148" title="2 of 4 branches missed.">		if (arg != null &amp;&amp; (arg instanceof IElevatorModel)) {</span>
+
+<span class="fc" id="L150">			model = (IElevatorModel) arg;</span>
+
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">			if (model.isConnected()) {</span>
+<span class="fc" id="L153">				lConnection.setBackground(Color.WHITE);</span>
+<span class="fc" id="L154">				lConnection.setText(&quot;Connected!&quot;);</span>
+<span class="fc" id="L155">			} else {</span>
+<span class="nc" id="L156">				lConnection.setBackground(Color.RED);</span>
+<span class="nc" id="L157">				lConnection.setText(&quot;No Connection!&quot;);</span>
+			}
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">			if (!uiLoaded) {</span>
+<span class="fc" id="L160">				int numberOfElevators = model.getElevatorNumber();</span>
+<span class="fc" id="L161">				floors = model.getFloors();</span>
+
+<span class="fc" id="L163">				int i = 0;</span>
+<span class="fc bfc" id="L164" title="All 2 branches covered.">				for (IFloor floor : floors) {</span>
+<span class="fc" id="L165">					floor = floors.get(i);</span>
+<span class="fc" id="L166">					i++;</span>
+				}
+
+<span class="fc" id="L169">				uiLoaded = true;</span>
+<span class="fc" id="L170">			} else {</span>
+<span class="nc" id="L171">				model = (IElevatorModel) arg;</span>
+<span class="nc" id="L172">				floors = model.getFloors();</span>
+<span class="nc" id="L173">				int i = 0;</span>
+
+<span class="nc" id="L175">				lSpeed.setText(model.getSpeed() + &quot; ft/sec&quot;);</span>
+<span class="nc" id="L176">				lWeight.setText(model.getWeight() + &quot; lbs&quot;);</span>
+
+				// clock = model.getClockTick();
+<span class="nc" id="L179">				ArrayList&lt;IFloor&gt; floorz = model.getFloors();</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">				for(int n=0;n&lt;FLOOR_COUNT;n++)</span>
+<span class="nc" id="L181">					rbFloors[n].setSelected(floorz.get(n).isTarget());</span>
+
+<span class="nc" id="L183">				int doorStatus = model.getDoorStatus();</span>
+<span class="nc" id="L184">				String dStatus = null;</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">				if (doorStatus == 1) {</span>
+<span class="nc" id="L186">					dStatus = &quot;Open&quot;;</span>
+<span class="nc" id="L187">					iiDoors = new ImageIcon(getClass().getClassLoader()</span>
+<span class="nc" id="L188">							.getResource(ICON_DOORS_OPEN));</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">				} else if (doorStatus == 1) {</span>
+<span class="nc" id="L190">					dStatus = &quot;Closed&quot;;</span>
+<span class="nc" id="L191">					iiDoors = new ImageIcon(getClass().getClassLoader()</span>
+<span class="nc" id="L192">							.getResource(ICON_DOORS_CLOSED));</span>
+				}
+				// up=0, down=1 and uncommitted=2
+<span class="nc bnc" id="L195" title="All 4 branches missed.">				switch (model.getCommittedDirection()) {</span>
+				case IElevator.ELEVATOR_DIRECTION_DOWN:
+<span class="nc" id="L197">					deCurrentDirection.setUpDirection(true);</span>
+<span class="nc" id="L198">					deCurrentDirection.setDownDirection(false);</span>
+<span class="nc" id="L199">					break;</span>
+				case IElevator.ELEVATOR_DIRECTION_UP:
+<span class="nc" id="L201">					deCurrentDirection.setDownDirection(true);</span>
+<span class="nc" id="L202">					deCurrentDirection.setUpDirection(false);</span>
+<span class="nc" id="L203">					break;</span>
+				case IElevator.ELEVATOR_DIRECTION_UNCOMMITTED:
+<span class="nc" id="L205">					deCurrentDirection.setUpDirection(false);</span>
+<span class="nc" id="L206">					deCurrentDirection.setDownDirection(false);</span>
+					break;
+				}
+
+<span class="nc bnc" id="L210" title="All 2 branches missed.">				for (IFloor floor : floors) {</span>
+
+<span class="nc" id="L212">					int floorNum = floor.getFloorNumber();</span>
+<span class="nc" id="L213">					boolean resultDown = floor.floorCommands(</span>
+<span class="nc" id="L214">							FloorCommands.GET_FLOOR_BUTTON_DOWN, floorNum);</span>
+<span class="nc" id="L215">					boolean resultUp = floor.floorCommands(</span>
+<span class="nc" id="L216">							FloorCommands.GET_FLOOR_BUTTON_UP, floorNum);</span>
+
+<span class="nc" id="L218">					deFloors[floorNum].setUpDirection(resultUp);</span>
+<span class="nc" id="L219">					deFloors[floorNum].setDownDirection(resultDown);</span>
+
+<span class="nc" id="L221">					rbFloors[floorNum].setSelected(floor.isTarget());</span>
+
+<span class="nc bnc" id="L223" title="All 2 branches missed.">					if (floorNum == model.getNextTargetFloor()) {</span>
+<span class="nc" id="L224">						bFloors[floorNum].setBackground(Color.YELLOW);</span>
+<span class="nc bnc" id="L225" title="All 2 branches missed.">					} else if (floorNum == model.getElevatorFloorNumber()) {</span>
+<span class="nc" id="L226">						bFloors[floorNum].setBackground(Color.MAGENTA);</span>
+<span class="nc" id="L227">					} else {</span>
+<span class="nc" id="L228">						bFloors[floorNum].setBackground(Color.WHITE);</span>
+					}
+
+				}
+			}
+
+			// if(cbManual.isSelected()){
+			// currentFloor = model.getElevatorFloorNumber();
+			// if(currentFloor == target || switchBackToAutoMode){
+			// int
+			// elevatorNum=Integer.parseInt(comboElevatorNumber.getSelectedItem().toString());
+			// setElevatorTarget(new int[]{elevatorNum-1,target});
+			// setFloorService(new Object[]{elevatorNum-1,target, true});
+			// switchBackToAutoMode = false;
+			// }
+			//
+			// }
+			// model.setElevatorPosition(model.getElevatorFloorNumber(),
+			// model.getCommittedDirection());
+			// setFloorrButtonStatus(floorNumber, requestedDirection);
+<span class="fc" id="L248">			System.out.println(&quot;ElevatorUI: &quot; + model.getElevatorNumber()</span>
+<span class="fc" id="L249">					+ &quot; direction:&quot; + model.getCommittedDirection() + &quot; floor:&quot;</span>
+<span class="fc" id="L250">					+ model.getElevatorFloorNumber());</span>
+		}
+<span class="fc" id="L252">	}</span>
+
+	public void setElevatorTarget(int[] param) {
+<span class="nc" id="L255">		boolean cmdSent = model.elevatorCommands(ElevatorCommands.SET_TARGET,</span>
+<span class="nc" id="L256">				param);</span>
+<span class="nc bnc" id="L257" title="All 2 branches missed.">		if (!cmdSent) {</span>
+<span class="nc" id="L258">			System.out.println(&quot;Error Occured while processing your request !&quot;);</span>
+			// JOptionPane.showMessageDialog(this,&quot;Error Occured while processing your request !&quot;);
+<span class="nc" id="L260">		} else {</span>
+<span class="nc" id="L261">			System.out.println(&quot;Succesful !&quot; + param[0] + &quot; &quot; + param[1]);</span>
+			// JOptionPane.showMessageDialog(this, &quot;Succesful !&quot;);
+		}
+<span class="nc" id="L264">	}</span>
+
+	public void setFloorService(Object[] param) {
+<span class="nc" id="L267">		boolean cmdSent = model.elevatorCommands(</span>
+<span class="nc" id="L268">				ElevatorCommands.SET_STOP_REQUEST, param);</span>
+<span class="nc bnc" id="L269" title="All 2 branches missed.">		if (!cmdSent) {</span>
+<span class="nc" id="L270">			System.out.println(&quot;ERROR!&quot;);</span>
+			// JOptionPane.showMessageDialog(this,&quot;Error Occured while processing your request !&quot;);
+<span class="nc" id="L272">		} else {</span>
+<span class="nc" id="L273">			System.out.println(&quot;SERVICES !&quot; + param[0] + &quot; &quot; + param[1] + &quot; &quot;</span>
+<span class="nc" id="L274">					+ param[2]);</span>
+			// JOptionPane.showMessageDialog(this, &quot;Succesful !&quot;);
+		}
+<span class="nc" id="L277">	}</span>
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+<span class="nc" id="L281">		int n = Integer.valueOf(e.getActionCommand());</span>
+<span class="nc" id="L282">		setElevatorTarget(new int[] { 0, n });</span>
+<span class="nc" id="L283">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.2.201409121644</span>AllTests (7) (08.01.2015 22:40:07)</div></body></html>
