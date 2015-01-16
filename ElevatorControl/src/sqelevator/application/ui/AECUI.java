@@ -39,6 +39,7 @@ public class AECUI extends JFrame implements Observer, ActionListener {
 	private JLabel lWeight, lSpeed, lConnection;
 	private JCheckBox cbManualControl;
 	private ImageIcon iiWeight, iiSpeed, iiDoors;
+	private JLabel lDoors;
 	private DirectionsUIElement deCurrentDirection;
 	private DirectionsUIElement[] deFloors;
 	private JButton[] bFloors;
@@ -77,7 +78,8 @@ public class AECUI extends JFrame implements Observer, ActionListener {
 		JPanel pDoorState = new JPanel();
 		pDoorState.setLayout(new BoxLayout(pDoorState, BoxLayout.Y_AXIS));
 		pDoorState.add(new JLabel("Doors"));
-		pDoorState.add(new JLabel(iiDoors));
+		lDoors = new JLabel(iiDoors);
+		pDoorState.add(lDoors);
 		pDoorDirection.add(pDoorState);
 		pDoorDirection.add(Box.createRigidArea(new Dimension(20, 0)));
 		JPanel pCurrentDirection = new JPanel();
@@ -158,7 +160,6 @@ public class AECUI extends JFrame implements Observer, ActionListener {
 				lConnection.setText("No Connection!");
 			}
 			if (!uiLoaded) {
-				int numberOfElevators = model.getElevatorNumber();
 				floors = model.getFloors();
 
 				int i = 0;
@@ -173,8 +174,8 @@ public class AECUI extends JFrame implements Observer, ActionListener {
 				floors = model.getFloors();
 				int i = 0;
 
-				lSpeed.setText(model.getSpeed() + " ft/sec");
-				lWeight.setText(model.getWeight() + " lbs");
+				lSpeed.setText(model.getSpeed() + " m/sec");
+				lWeight.setText(model.getWeight() + " kg");
 
 				// clock = model.getClockTick();
 				ArrayList<IFloor> floorz = model.getFloors();
@@ -182,15 +183,13 @@ public class AECUI extends JFrame implements Observer, ActionListener {
 					rbFloors[n].setSelected(floorz.get(n).isTarget());
 
 				int doorStatus = model.getDoorStatus();
-				String dStatus = null;
+				System.out.println(doorStatus);
 				if (doorStatus == 1) {
-					dStatus = "Open";
-					iiDoors = new ImageIcon(getClass().getClassLoader()
-							.getResource(ICON_DOORS_OPEN));
-				} else if (doorStatus == 1) {
-					dStatus = "Closed";
-					iiDoors = new ImageIcon(getClass().getClassLoader()
-							.getResource(ICON_DOORS_CLOSED));
+					lDoors.setIcon(new ImageIcon(getClass().getClassLoader()
+							.getResource(ICON_DOORS_OPEN)));
+				} else {
+					lDoors.setIcon(new ImageIcon(getClass().getClassLoader()
+							.getResource(ICON_DOORS_CLOSED)));
 				}
 				// up=0, down=1 and uncommitted=2
 				switch (model.getCommittedDirection()) {
@@ -231,12 +230,6 @@ public class AECUI extends JFrame implements Observer, ActionListener {
 
 				}
 			}
-//			System.out.println("ElevatorUI: " + model.getElevatorNumber()
-//					+ " direction:" + model.getCommittedDirection() + " floor:"
-//					+ model.getElevatorFloorNumber());
-//			if(model.getElevatorFloorNumber() == model.getNextTargetFloor()){
-//				setDirectionStatus(new int[] { 0, model.getElevatorFloorNumber()});
-//			}
 		}
 	}
 
